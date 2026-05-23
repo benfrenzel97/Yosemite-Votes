@@ -491,14 +491,12 @@ function switchUser() {
 
 function loadVotes() {
   setSaveStatus('Loading votes...');
-  fetch(SCRIPT_URL)
+  fetch(SCRIPT_URL + '?t=' + Date.now())
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      // Separate my votes from others
       var myName = currentUser.name.trim().toLowerCase();
       otherVotes = {};
       allVotes = {};
-
       (data.votes || []).forEach(function(v) {
         var isMe = v.name.trim().toLowerCase() === myName;
         if (isMe) {
@@ -508,13 +506,12 @@ function loadVotes() {
           otherVotes[v.activity].push({ name: v.name, vote: v.vote });
         }
       });
-
       renderApp();
       setSaveStatus('');
     })
     .catch(function() {
       renderApp();
-      setSaveStatus('Could not load existing votes');
+      setSaveStatus('');
     });
 }
 
@@ -643,14 +640,13 @@ function showToast(msg) {
 
 function submitAll() {
   setSaveStatus('Saving...');
-  var promises = [];
+  var votes = [];
 
   SECTIONS.forEach(function(sec) {
     sec.items.forEach(function(item) {
       var saved = allVotes[item.id] || {};
-      if (!saved.vote) return; // only submit voted items
-
-      var payload = {
+      if (!saved.vote) return;
+      votes.push({
         name: currentUser.name,
         group: currentUser.group,
         activity: item.id,
@@ -658,33 +654,47 @@ function submitAll() {
         day: saved.day || item.day,
         confirmedBy: saved.confirmedBy || '',
         comments: saved.comments || ''
-      };
-
-      promises.push(
-        fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        })
-      );
+      });
     });
   });
 
-  if (promises.length === 0) {
+  if (votes.length === 0) {
     showToast('No votes to save yet!');
     setSaveStatus('');
     return;
   }
 
-  Promise.all(promises)
-    .then(function() {
-      setSaveStatus('Saved ✓');
-      showToast('Votes saved! 🏔️');
-      loadVotes(); // reload to show updated other votes
-    })
-    .catch(function() {
-      setSaveStatus('Save failed — try again');
-      showToast('Error saving. Check connection.');
-    });
+  // Bundle all votes and POST via iframe to avoid CORS
+  var iframe = document.getElementById('hidden-iframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.name = 'hidden-iframe';
+    iframe.id = 'hidden-iframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
+
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = SCRIPT_URL;
+  form.target = 'hidden-iframe';
+  form.style.display = 'none';
+
+  var input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'payload';
+  input.value = JSON.stringify({votes: votes});
+  form.appendChild(input);
+  document.body.appendChild(form);
+
+  iframe.onload = function() {
+    setSaveStatus('Saved');
+    showToast('Votes saved!');
+    setTimeout(function() { loadVotes(); }, 1500);
+  };
+
+  form.submit();
+  document.body.removeChild(form);
 }
 </script>
 </body>
