@@ -214,6 +214,21 @@
   }
 
   .card-meta { font-size: 0.76rem; color: var(--muted); margin-bottom: 8px; line-height: 1.4; }
+  .card-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .card-link {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .card-link:hover { background: var(--border); }
+  .card-link.maps { border-color: #4285f4; color: #4285f4; }
+  .card-link.web { border-color: var(--accent); color: var(--accent); }
 
   .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
 
@@ -227,6 +242,7 @@
   }
 
   .tag-nn { background: var(--green-bg); color: var(--green); }
+  .tag-kid { background: #e0f2fe; color: #0369a1; }
   .tag-easy { background: var(--green-bg); color: var(--green); }
   .tag-mod { background: var(--amber-bg); color: var(--amber); }
   .tag-hard { background: var(--red-bg); color: var(--red); }
@@ -394,13 +410,25 @@
       <div class="stat"><span class="dot dot-amber"></span><span id="pending-count">0</span> pending</div>
       <div class="save-status" id="save-status"></div>
     </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-vote" onclick="switchTab('vote')">🗳️ Vote</button>
+      <button class="tab-btn" id="tab-dash" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    </div>
   </header>
 
   <main id="main-content">
     <div class="loading">Loading activities...</div>
   </main>
 
-  <button class="fab" onclick="submitAll()">💾 Save All Votes</button>
+  <main id="dash-content" style="display:none;max-width:700px;margin:0 auto;padding:1.5rem 1rem 4rem;">
+    <div class="dash-refresh">
+      <span id="dash-last-updated">Pull latest votes to see results</span>
+      <button class="refresh-btn" onclick="loadDashboard()">⟳ Refresh</button>
+    </div>
+    <div id="dash-inner"><div class="loading">Click Refresh to load results</div></div>
+  </main>
+
+  <button class="fab" id="save-fab" onclick="submitAll()">💾 Save All Votes</button>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -412,48 +440,112 @@ const GROUPS = ['Select group...','All groups','Frenzels','Simmons','Barrus','Fr
 
 const SECTIONS = [
   { label: 'Whole Group', items: [
-    { id:'grp-dinner', name:'Group dinner night — Murphys', meta:'20 min · $20–40/person · Only full overlap day', day:'Wed · Jun 10', grp:'All groups' }
+    { id:'grp-dinner', name:'Group dinner night — Murphys', meta:'20 min · $20–40/person · Only full overlap day', day:'Wed · Jun 10', grp:'All groups',
+      maps:'https://maps.google.com/?q=Branding+Iron+Saloon+Murphys+CA',
+      web:'https://www.tripadvisor.com/Restaurant_Search-g32561-Murphys_Calaveras_County_California.html' }
   ]},
   { label: 'Day Hikes — Local', items: [
-    { id:'natural-bridges', name:'Natural Bridges Trail', tags:['easy–mod'], meta:'10 min · 2.1 mi · Free · Cave swim, gets wet', day:'Mon · Jun 9' },
-    { id:'carson-creek', name:'Carson Creek Trail Loop', tags:['easy'], meta:'15 min · 4 mi · Free · Lake views, all fitness', day:'Sun · Jun 7' },
-    { id:'angels-creek', name:'Angels Creek Trail', tags:['easy'], meta:'15 min · 3.4 mi · Free · Serene, dog friendly', day:'Sun · Jun 7' },
-    { id:'mineshaft', name:'Mineshaft Trail — Murphys', tags:['easy–mod'], meta:'20 min · 2.8 mi · Free · Old mining road', day:'Mon · Jun 9' },
-    { id:'big-trees-north', name:'Calaveras Big Trees — North Grove', tags:['easy'], meta:'35 min · 2 mi · ~$10/car · Flat, all ages', day:'Thu · Jun 11' },
-    { id:'big-trees-south', name:'Calaveras Big Trees — South Grove', tags:['moderate'], meta:'35 min · 5+ mi · ~$10/car · More workout', day:'Thu · Jun 11' },
-    { id:'pinecrest', name:'Pinecrest Lake Loop', tags:['moderate'], meta:'60 min · 6+ mi · Free · Lake, waterfall, swim hole', day:'Fri · Jun 12' },
-    { id:'arnold-rim', name:'Arnold Rim Trail', tags:['hard'], meta:'26 min · 3.1 mi · Free · 450ft gain, serious hikers', day:'Fri · Jun 12' }
+    { id:'natural-bridges', name:'Natural Bridges Trail', tags:['easy–mod'], kids:true, meta:'10 min · 2.1 mi · Free · Cave swim, gets wet', day:'Mon · Jun 9',
+      maps:'https://maps.google.com/?q=Natural+Bridges+Day+Use+Area+Vallecito+CA',
+      web:'https://www.hikespeak.com/trails/upper-natural-bridge-hike-calaveras-county/' },
+    { id:'carson-creek', name:'Carson Creek Trail Loop', tags:['easy'], kids:true, meta:'15 min · 4 mi · Free · Lake views, all fitness', day:'Sun · Jun 7',
+      maps:'https://maps.google.com/?q=Carson+Creek+Trail+New+Melones+CA',
+      web:'https://www.alltrails.com/trail/us/california/carson-creek-trail' },
+    { id:'angels-creek', name:'Angels Creek Trail', tags:['easy'], kids:true, meta:'15 min · 3.4 mi · Free · Serene, dog friendly', day:'Sun · Jun 7',
+      maps:'https://maps.google.com/?q=Angels+Creek+Trail+Angels+Camp+CA',
+      web:'https://www.alltrails.com/trail/us/california/angels-creek-trail' },
+    { id:'mineshaft', name:'Mineshaft Trail — Murphys', tags:['easy–mod'], kids:true, meta:'20 min · 2.8 mi · Free · Old mining road, great views', day:'Mon · Jun 9',
+      maps:'https://maps.google.com/?q=Mineshaft+Trail+Murphys+CA',
+      web:'https://www.alltrails.com/trail/us/california/mineshaft-trail' },
+    { id:'big-trees-north', name:'Calaveras Big Trees — North Grove', tags:['easy'], kids:true, meta:'35 min · 2 mi · ~$10/car · Flat, all ages', day:'Thu · Jun 11',
+      maps:'https://maps.google.com/?q=Calaveras+Big+Trees+State+Park+Arnold+CA',
+      web:'https://www.parks.ca.gov/calaverasbigtrees' },
+    { id:'big-trees-south', name:'Calaveras Big Trees — South Grove', tags:['moderate'], kids:false, meta:'35 min · 5+ mi · ~$10/car · More workout', day:'Thu · Jun 11',
+      maps:'https://maps.google.com/?q=Calaveras+Big+Trees+South+Grove+Arnold+CA',
+      web:'https://www.parks.ca.gov/calaverasbigtrees' },
+    { id:'pinecrest', name:'Pinecrest Lake Loop', tags:['moderate'], kids:true, meta:'60 min · 6+ mi · Free · Lake, waterfall, swim hole', day:'Fri · Jun 12',
+      maps:'https://maps.google.com/?q=Pinecrest+Lake+CA',
+      web:'https://www.alltrails.com/trail/us/california/pinecrest-lake-loop' },
+    { id:'arnold-rim', name:'Arnold Rim Trail', tags:['hard'], kids:false, meta:'26 min · 3.1 mi · Free · 450ft gain, serious hikers', day:'Fri · Jun 12',
+      maps:'https://maps.google.com/?q=Arnold+Rim+Trail+Arnold+CA',
+      web:'https://www.alltrails.com/trail/us/california/arnold-rim-trail' }
   ]},
   { label: 'Day Hikes — Yosemite (2 hrs)', items: [
-    { id:'cooks-meadow', name:"Cook's Meadow Loop", tags:['easy'], meta:'2 hrs · 1 mi · Free · Stroller friendly, iconic views', day:'Sat · Jun 7' },
-    { id:'mirror-lake', name:'Mirror Lake', tags:['easy'], meta:'2 hrs · 2–5 mi · Free · Kids can splash and swim', day:'Sat · Jun 7' },
-    { id:'sentinel-dome', name:'Sentinel Dome + Taft Point', tags:['easy–mod'], meta:'2 hrs · 2.2 mi each · Free · Epic views', day:'Mon · Jun 9' },
-    { id:'vernal-falls', name:'Vernal Falls — Mist Trail', tags:['moderate'], meta:'2 hrs · 3 mi · Free · Steep, assess kids first', day:'Mon · Jun 9' },
-    { id:'glacier-point', name:'Four Mile Trail to Glacier Point', tags:['hard'], meta:'2 hrs · 10 mi RT · Free · 3,400ft gain', day:'Fri · Jun 12' }
+    { id:'cooks-meadow', name:"Cook's Meadow Loop", tags:['easy'], kids:true, meta:'2 hrs · 1 mi · Free · Stroller friendly, iconic views', day:'Sat · Jun 7',
+      maps:'https://maps.google.com/?q=Cooks+Meadow+Loop+Yosemite+Valley',
+      web:'https://www.nps.gov/yose/planyourvisit/valleyhikes.htm' },
+    { id:'mirror-lake', name:'Mirror Lake', tags:['easy'], kids:true, meta:'2 hrs · 2–5 mi · Free · Kids can splash and swim', day:'Sat · Jun 7',
+      maps:'https://maps.google.com/?q=Mirror+Lake+Yosemite+National+Park',
+      web:'https://www.nps.gov/yose/planyourvisit/mirrorlake.htm' },
+    { id:'sentinel-dome', name:'Sentinel Dome + Taft Point', tags:['easy–mod'], kids:false, meta:'2 hrs · 2.2 mi each · Free · Epic views', day:'Mon · Jun 9',
+      maps:'https://maps.google.com/?q=Sentinel+Dome+Yosemite',
+      web:'https://www.alltrails.com/trail/us/california/sentinel-dome-trail' },
+    { id:'vernal-falls', name:'Vernal Falls — Mist Trail', tags:['moderate'], kids:false, meta:'2 hrs · 3 mi · Free · Steep, assess kids first', day:'Mon · Jun 9',
+      maps:'https://maps.google.com/?q=Vernal+Falls+Yosemite',
+      web:'https://www.nps.gov/yose/planyourvisit/misttrail.htm' },
+    { id:'glacier-point', name:'Four Mile Trail to Glacier Point', tags:['hard'], kids:false, meta:'2 hrs · 10 mi RT · Free · 3,400ft gain', day:'Fri · Jun 12',
+      maps:'https://maps.google.com/?q=Glacier+Point+Yosemite',
+      web:'https://www.alltrails.com/trail/us/california/four-mile-trail' }
   ]},
   { label: 'Kids', items: [
-    { id:'gold-panning', name:'Gold panning — Angels Camp Museum', meta:'5 min · ~$10–15/kid', day:'Sun · Jun 8' },
-    { id:'gem-mining', name:'Gem mining flume — Moaning Cavern', meta:'10 min · ~$10–15/kid', day:'Sun · Jun 8' },
-    { id:'angels-museum', name:'Angels Camp Museum', meta:'5 min · $10/kid · Gold Rush history, frog jump', day:'Sun · Jun 8' },
-    { id:'climbing-tower', name:'Climbing tower — Moaning Cavern', meta:'10 min · ~$10/kid · ⚠ Verify open', day:'Sun · Jun 8' },
-    { id:'kids-rafting', name:'Little kids rafting', tags:['non-negotiable'], meta:'2 hrs · ~$30/person · Book in person Curry Village', day:'Tue · Jun 9' }
+    { id:'gold-panning', name:'Gold panning — Angels Camp Museum', kids:true, meta:'5 min · ~$10–15/kid', day:'Sun · Jun 8',
+      maps:'https://maps.google.com/?q=Angels+Camp+Museum+Angels+Camp+CA',
+      web:'https://www.angelscamp.gov/museum' },
+    { id:'gem-mining', name:'Gem mining flume — Moaning Cavern', kids:true, meta:'10 min · ~$10–15/kid', day:'Sun · Jun 8',
+      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
+      web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'angels-museum', name:'Angels Camp Museum', kids:true, meta:'5 min · $10/kid · Gold Rush history, frog jump', day:'Sun · Jun 8',
+      maps:'https://maps.google.com/?q=Angels+Camp+Museum+Angels+Camp+CA',
+      web:'https://www.angelscamp.gov/museum' },
+    { id:'climbing-tower', name:'Climbing tower — Moaning Cavern', kids:true, meta:'10 min · ~$10/kid · ⚠ Verify open', day:'Sun · Jun 8',
+      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
+      web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'kids-rafting', name:'Little kids rafting', tags:['non-negotiable'], kids:true, meta:'2 hrs · ~$30/person · Book in person Curry Village', day:'Tue · Jun 9',
+      maps:'https://maps.google.com/?q=Curry+Village+Yosemite+Valley',
+      web:'https://www.travelyosemite.com/things-to-do/rafting/' }
   ]},
   { label: 'Adults', items: [
-    { id:'big-rafting', name:'Big kids rafting', tags:['non-negotiable'], meta:'2 hrs · $123–168/person · Book Sierra Mac or ARTA', day:'Fri · Jun 13' },
-    { id:'axe-throwing', name:'Axe throwing — Moaning Cavern', meta:'10 min · $20/lane · Ages 12+', day:'Sun · Jun 8' },
-    { id:'fishing', name:'New Melones Lake fishing', meta:'15 min · ~$20–30 + license', day:'Thu · Jun 12' },
-    { id:'mercer-caverns', name:'Mercer Caverns tour', meta:'20 min · ~$20/adult', day:'Tue · Jun 10' },
-    { id:'stanislaus', name:'Stanislaus National Forest', meta:'30 min · Free · Hiking, biking, backpacking', day:'Thu · Jun 12' },
-    { id:'ironstone', name:'Ironstone Vineyards', meta:'20 min · $15 tasting · For you only 🍷', day:'Tue · Jun 10' }
+    { id:'big-rafting', name:'Big kids rafting', tags:['non-negotiable'], meta:'2 hrs · $123–168/person · Book Sierra Mac or ARTA', day:'Fri · Jun 13',
+      maps:'https://maps.google.com/?q=Sierra+Mac+River+Trips+Groveland+CA',
+      web:'https://www.sierramac.com/' },
+    { id:'axe-throwing', name:'Axe throwing — Moaning Cavern', meta:'10 min · $20/lane · Ages 12+', day:'Sun · Jun 8',
+      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
+      web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'fishing', name:'New Melones Lake fishing', meta:'15 min · ~$20–30 + license', day:'Thu · Jun 12',
+      maps:'https://maps.google.com/?q=New+Melones+Lake+Marina+Jamestown+CA',
+      web:'https://www.newmeloneslakemarina.com/' },
+    { id:'mercer-caverns', name:'Mercer Caverns tour', meta:'20 min · ~$20/adult', day:'Tue · Jun 10',
+      maps:'https://maps.google.com/?q=Mercer+Caverns+Murphys+CA',
+      web:'https://mercercaverns.com/' },
+    { id:'stanislaus', name:'Stanislaus National Forest', meta:'30 min · Free · Hiking, biking, backpacking', day:'Thu · Jun 12',
+      maps:'https://maps.google.com/?q=Stanislaus+National+Forest+CA',
+      web:'https://www.fs.usda.gov/stanislaus' },
+    { id:'ironstone', name:'Ironstone Vineyards', meta:'20 min · $15 tasting · For you only', day:'Tue · Jun 10',
+      maps:'https://maps.google.com/?q=Ironstone+Vineyards+Murphys+CA',
+      web:'https://www.ironstonevineyards.com/' }
   ]},
   { label: 'Everyone', items: [
-    { id:'moaning-cavern', name:'Moaning Cavern tour', meta:'10 min · $14/adult $7/kid · Largest cave in CA', day:'Sun · Jun 8' },
-    { id:'redwood-forest', name:'Calaveras Big Trees — Redwood Forest day', tags:['non-negotiable'], meta:'35 min · ~$10/car · Simmons joins before departing', day:'Wed · Jun 10', grp:'All groups' },
-    { id:'melones-swim', name:'New Melones Lake — swim/kayak', meta:'15 min · ~$20–30 · 12,500 acre lake', day:'Mon · Jun 9' },
-    { id:'murphys-evening', name:'Murphys downtown evening', meta:'20 min · Free · Pair with group dinner', day:'Wed · Jun 10', grp:'All groups' },
-    { id:'disc-golf', name:'Disc golf — Murphys', meta:'20 min · Free · All ages', day:'Mon · Jun 9' },
-    { id:'yosemite-bike', name:'Bike Yosemite Valley', meta:'2 hrs · ~$65/day rental · Flat, all ages', day:'Sat · Jun 7' },
-    { id:'el-capitan', name:'El Capitan viewpoint', meta:'2 hrs · Free · No hiking needed', day:'Sat · Jun 7' }
+    { id:'moaning-cavern', name:'Moaning Cavern tour', kids:true, meta:'10 min · $14/adult $7/kid · Largest cave in CA', day:'Sun · Jun 8',
+      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
+      web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'redwood-forest', name:'Calaveras Big Trees — Redwood Forest day', tags:['non-negotiable'], kids:true, meta:'35 min · ~$10/car · Simmons joins before departing', day:'Wed · Jun 10', grp:'All groups',
+      maps:'https://maps.google.com/?q=Calaveras+Big+Trees+State+Park+Arnold+CA',
+      web:'https://www.parks.ca.gov/calaverasbigtrees' },
+    { id:'melones-swim', name:'New Melones Lake — swim/kayak', kids:true, meta:'15 min · ~$20–30 · 12,500 acre lake', day:'Mon · Jun 9',
+      maps:'https://maps.google.com/?q=New+Melones+Lake+Recreation+Area+CA',
+      web:'https://www.newmeloneslakemarina.com/' },
+    { id:'murphys-evening', name:'Murphys downtown evening', kids:true, meta:'20 min · Free · Pair with group dinner', day:'Wed · Jun 10', grp:'All groups',
+      maps:'https://maps.google.com/?q=Main+Street+Murphys+CA',
+      web:'https://www.visitmurphys.com/' },
+    { id:'disc-golf', name:'Disc golf — Murphys', kids:true, meta:'20 min · Free · All ages', day:'Mon · Jun 9',
+      maps:'https://maps.google.com/?q=Feeney+Park+Murphys+CA',
+      web:'https://www.udisc.com/courses/feeney-park' },
+    { id:'yosemite-bike', name:'Bike Yosemite Valley', kids:true, meta:'2 hrs · ~$65/day rental · Flat, all ages', day:'Sat · Jun 7',
+      maps:'https://maps.google.com/?q=Yosemite+Valley+Bike+Rentals',
+      web:'https://www.travelyosemite.com/things-to-do/bicycling/' },
+    { id:'el-capitan', name:'El Capitan viewpoint', kids:true, meta:'2 hrs · Free · No hiking needed', day:'Sat · Jun 7',
+      maps:'https://maps.google.com/?q=El+Capitan+Viewpoint+Yosemite',
+      web:'https://www.nps.gov/yose/planyourvisit/elcapitan.htm' }
   ]}
 ];
 
@@ -559,13 +651,25 @@ function renderApp() {
       html += '<div class="' + cardClass + '" id="card-' + item.id + '">';
       html += '<div class="card-top"><span class="card-name">' + item.name + '</span><span class="suggested">' + item.day + '</span></div>';
 
+      var tagHtml = '';
       if (item.tags && item.tags.length) {
-        html += '<div class="tags">' + item.tags.map(function(t) {
+        tagHtml += item.tags.map(function(t) {
           return '<span class="tag ' + tagClass(t) + '">' + t + '</span>';
-        }).join('') + '</div>';
+        }).join('');
       }
+      if (item.kids) {
+        tagHtml += '<span class="tag tag-kid">👧 kid-friendly</span>';
+      }
+      if (tagHtml) html += '<div class="tags">' + tagHtml + '</div>';
 
       html += '<div class="card-meta">' + item.meta + '</div>';
+
+      if (item.maps || item.web) {
+        html += '<div class="card-links">';
+        if (item.maps) html += '<a class="card-link maps" href="' + item.maps + '" target="_blank">📍 Google Maps</a>';
+        if (item.web) html += '<a class="card-link web" href="' + item.web + '" target="_blank">🔗 Website</a>';
+        html += '</div>';
+      }
 
       html += '<div class="btn-row">';
       html += '<button class="vote-btn' + (vote === 'yes' ? ' active-yes' : '') + '" onclick="castVote(\'' + item.id + '\',\'yes\',this)">✓ Yes</button>';
@@ -710,6 +814,135 @@ function submitAll() {
   form.submit();
   document.body.removeChild(form);
 }
+
+function switchTab(tab) {
+  var voteMain = document.getElementById('main-content');
+  var dashMain = document.getElementById('dash-content');
+  var saveFab = document.getElementById('save-fab');
+  var tabVote = document.getElementById('tab-vote');
+  var tabDash = document.getElementById('tab-dash');
+
+  if (tab === 'vote') {
+    voteMain.style.display = 'block';
+    dashMain.style.display = 'none';
+    saveFab.style.display = 'block';
+    tabVote.classList.add('active');
+    tabDash.classList.remove('active');
+  } else {
+    voteMain.style.display = 'none';
+    dashMain.style.display = 'block';
+    saveFab.style.display = 'none';
+    tabVote.classList.remove('active');
+    tabDash.classList.add('active');
+    loadDashboard();
+  }
+}
+
+function loadDashboard() {
+  document.getElementById('dash-inner').innerHTML = '<div class="loading">Loading results...</div>';
+
+  var callbackName = 'dashCallback_' + Date.now();
+  var script = document.createElement('script');
+
+  window[callbackName] = function(data) {
+    delete window[callbackName];
+    try { document.body.removeChild(script); } catch(e) {}
+    renderDashboard(data.votes || []);
+    document.getElementById('dash-last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+  };
+
+  script.onerror = function() {
+    delete window[callbackName];
+    try { document.body.removeChild(script); } catch(e) {}
+    // Fallback: try regular fetch
+    fetch(SCRIPT_URL + '?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(data) { renderDashboard(data.votes || []); })
+      .catch(function() {
+        document.getElementById('dash-inner').innerHTML = '<div class="loading">Could not load — check connection</div>';
+      });
+  };
+
+  script.src = SCRIPT_URL + '?callback=' + callbackName + '&t=' + Date.now();
+  document.body.appendChild(script);
+}
+
+function renderDashboard(votes) {
+  // Get all unique voters
+  var allVoters = {};
+  votes.forEach(function(v) {
+    if (!allVoters[v.name.toLowerCase()]) {
+      allVoters[v.name.toLowerCase()] = { name: v.name, group: v.group };
+    }
+  });
+
+  // Build vote map: activity -> { yes: [names], no: [names] }
+  var voteMap = {};
+  votes.forEach(function(v) {
+    if (!voteMap[v.activity]) voteMap[v.activity] = { yes: [], no: [] };
+    if (v.vote === 'yes') voteMap[v.activity].yes.push(v.name);
+    else if (v.vote === 'no') voteMap[v.activity].no.push(v.name);
+  });
+
+  var voterCount = Object.keys(allVoters).length;
+  var html = '';
+
+  // Voter summary
+  if (voterCount > 0) {
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:1rem;">';
+    html += '<div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;">' + voterCount + ' people have voted</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
+    Object.values(allVoters).forEach(function(v) {
+      html += '<span style="font-size:0.78rem;padding:3px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border);">' + v.name + ' <span style="color:var(--muted);font-size:0.7rem;">· ' + v.group + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+
+  SECTIONS.forEach(function(sec) {
+    html += '<div class="dash-section-label">' + sec.label + '</div>';
+    sec.items.forEach(function(item) {
+      var vm = voteMap[item.id] || { yes: [], no: [] };
+      var yesCount = vm.yes.length;
+      var noCount = vm.no.length;
+
+      html += '<div class="dash-card">';
+      html += '<div class="dash-card-top">';
+      html += '<span class="dash-name">' + item.name + '</span>';
+      html += '<span class="dash-day">' + item.day + '</span>';
+      html += '</div>';
+      html += '<div class="dash-votes">';
+
+      // Yes column
+      html += '<div class="dash-col">';
+      html += '<div class="dash-col-label yes">Yes (' + yesCount + ')</div>';
+      if (vm.yes.length) {
+        vm.yes.forEach(function(n) {
+          html += '<span class="dash-name-pill yes">' + n + '</span>';
+        });
+      } else {
+        html += '<span class="dash-empty">none yet</span>';
+      }
+      html += '</div>';
+
+      // No column
+      html += '<div class="dash-col">';
+      html += '<div class="dash-col-label no">No (' + noCount + ')</div>';
+      if (vm.no.length) {
+        vm.no.forEach(function(n) {
+          html += '<span class="dash-name-pill no">' + n + '</span>';
+        });
+      } else {
+        html += '<span class="dash-empty">none yet</span>';
+      }
+      html += '</div>';
+
+      html += '</div></div>';
+    });
+  });
+
+  document.getElementById('dash-inner').innerHTML = html;
+}
+
 </script>
 </body>
 </html>
