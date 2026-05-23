@@ -363,6 +363,151 @@
     color: var(--muted);
     font-size: 0.9rem;
   }
+
+  /* ── TABS ── */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 3px;
+    margin-top: 0.75rem;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    background: white;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── DASHBOARD ── */
+  .dash-refresh {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .dash-refresh span { font-size: 0.8rem; color: var(--muted); }
+  .refresh-btn {
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .refresh-btn:hover { opacity: 0.7; }
+  .dash-section-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 2rem 0 0.75rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dash-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .dash-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+  .dash-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    flex: 1;
+    color: var(--text);
+  }
+  .dash-day {
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .dash-votes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .dash-col { flex: 1; min-width: 100px; }
+  .dash-col-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
+  }
+  .dash-col-label.yes { color: var(--green); }
+  .dash-col-label.no { color: var(--red); }
+  .dash-name-pill {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin: 2px 3px 2px 0;
+    font-weight: 500;
+  }
+  .dash-name-pill.yes { background: var(--green-bg); color: var(--green); }
+  .dash-name-pill.no { background: var(--red-bg); color: var(--red); }
+  .dash-empty { font-size: 0.75rem; color: var(--muted); font-style: italic; }
+  .voter-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 1rem;
+  }
+  .voter-summary-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .voter-pill {
+    display: inline-block;
+    font-size: 0.78rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    margin: 2px 3px 2px 0;
+  }
+  .voter-pill-group { color: var(--muted); font-size: 0.7rem; }
+
 </style>
 </head>
 <body>
@@ -889,11 +1034,11 @@ function renderDashboard(votes) {
 
   // Voter summary
   if (voterCount > 0) {
-    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:1rem;">';
-    html += '<div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;">' + voterCount + ' people have voted</div>';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
+    html += '<div class="voter-summary">';
+    html += '<div class="voter-summary-label">' + voterCount + ' ' + (voterCount === 1 ? 'person has' : 'people have') + ' voted</div>';
+    html += '<div>';
     Object.values(allVoters).forEach(function(v) {
-      html += '<span style="font-size:0.78rem;padding:3px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border);">' + v.name + ' <span style="color:var(--muted);font-size:0.7rem;">· ' + v.group + '</span></span>';
+      html += '<span class="voter-pill">' + v.name + ' <span class="voter-pill-group">· ' + v.group + '</span></span>';
     });
     html += '</div></div>';
   }
