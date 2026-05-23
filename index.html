@@ -544,7 +544,7 @@
   <header>
     <div class="header-top">
       <div>
-        <h1>Yosemite Activity Vote</h1>
+        <h1>Yosemite Activity Vote <span style="font-size:0.6rem;font-weight:400;color:rgba(255,255,255,0.4);vertical-align:middle;letter-spacing:0.05em;">v1.4</span></h1>
         <div class="user-info" id="user-display"></div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><button class="switch-btn" onclick="switchUser()">Switch user</button><span style="font-size:0.65rem;color:rgba(255,255,255,0.35);letter-spacing:0.04em;">v1.4</span></div>
@@ -781,7 +781,10 @@ function makeSelect(opts, def, cls, onchange) {
 }
 
 function renderApp() {
-  var html = '';
+  var html = '<div style="background:#fef9f0;border:1px solid #f0d9b5;border-radius:10px;padding:12px 14px;margin-bottom:1.5rem;font-size:0.83rem;line-height:1.6;color:#7a5c2e;">' +
+    '<strong style="display:block;margin-bottom:4px;">A note before you vote 👋</strong>' +
+    'No pressure to vote on everything — skip anything you\'re unsure about. This isn\'t the final schedule, just a way for us to see what people are excited about so we can narrow things down and build a plan. The more feedback the better!' +
+    '</div>';
 
   SECTIONS.forEach(function(sec) {
     html += '<div class="section-label">' + sec.label + '</div>';
