@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yosemite Trip — Activity Vote</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
   :root {
     --bg: #f5f2ee;
@@ -21,496 +21,153 @@
     --amber-bg: #fef3c7;
     --accent: #c17a3a;
     --accent-dark: #9e5f24;
+    /* Dashboard — National Park Poster */
+    --park-bg: #1a2e2a;
+    --park-border: #3a5248;
+    --park-teal: #2a9d8f;
+    --park-cream: #f4e9d0;
+    --park-brick: #c1440e;
+    --park-gold: #e9c46a;
+    --park-muted: #7a9e96;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ── WELCOME SCREEN ── */
-  #welcome-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-  }
-
-  .welcome-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2.5rem 2rem;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-  }
-
+  /* WELCOME */
+  #welcome-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+  .welcome-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem 2rem; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
   .welcome-card .emoji { font-size: 2.5rem; margin-bottom: 1rem; }
-
-  .welcome-card h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.8rem;
-    font-weight: 400;
-    margin-bottom: 0.5rem;
-  }
-
-  .welcome-card p {
-    font-size: 0.88rem;
-    color: var(--muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-  }
-
+  .welcome-card h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .welcome-card p { font-size: 0.88rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
   .input-group { margin-bottom: 1rem; text-align: left; }
   .input-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 5px; display: block; }
-
-  input[type=text], select {
-    width: 100%;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
+  input[type=text], select { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; outline: none; transition: border-color 0.15s; }
   input[type=text]:focus, select:focus { border-color: var(--accent); }
-
-  .start-btn {
-    width: 100%;
-    padding: 12px;
-    background: var(--text);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: opacity 0.15s;
-  }
-
+  .start-btn { width: 100%; padding: 12px; background: var(--text); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s; }
   .start-btn:hover { opacity: 0.85; }
   .error-msg { color: var(--red); font-size: 0.82rem; margin-top: 8px; }
 
-  /* ── MAIN VOTING APP ── */
+  /* APP */
   #app-screen { display: none; }
-
-  header {
-    background: var(--text);
-    color: white;
-    padding: 1.25rem 1.5rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.75rem;
-  }
-
-  header h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.3rem;
-    font-weight: 400;
-  }
-
-  header .user-info {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.6);
-    margin-top: 2px;
-  }
-
-  .switch-btn {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.6);
-    background: none;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 20px;
-    padding: 4px 10px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    white-space: nowrap;
-  }
-
-  .summary-bar {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
+  header { background: var(--text); color: white; padding: 1.25rem 1.5rem; position: sticky; top: 0; z-index: 100; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+  header .user-info { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .switch-btn { font-size: 0.75rem; color: rgba(255,255,255,0.6); background: none; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .summary-bar { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
   .stat { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: rgba(255,255,255,0.75); }
   .dot { width: 8px; height: 8px; border-radius: 50%; }
   .dot-green { background: #4ade80; }
   .dot-red { background: #f87171; }
   .dot-amber { background: #fbbf24; }
-
-  .save-status {
-    margin-left: auto;
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.5);
-    font-style: italic;
-  }
-
+  .save-status { margin-left: auto; font-size: 0.75rem; color: rgba(255,255,255,0.5); font-style: italic; }
   main { max-width: 700px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
-
-  .section-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 2rem 0 0.75rem;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    transition: border-color 0.2s, border-left 0.2s;
-  }
-
+  .section-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 2rem 0 0.75rem; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; transition: border-color 0.2s, border-left 0.2s; }
   .card.yes { border-color: var(--green); border-left: 4px solid var(--green); }
   .card.no { border-color: #e5a0a8; border-left: 4px solid var(--red); opacity: 0.6; }
-
-  .card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 3px;
-  }
-
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 3px; }
   .card-name { font-size: 0.92rem; font-weight: 600; flex: 1; line-height: 1.3; }
-
-  .suggested {
-    font-size: 0.7rem;
-    color: var(--muted);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 2px 7px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
+  .suggested { font-size: 0.7rem; color: var(--muted); background: var(--bg); border: 1px solid var(--border); padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
   .card-meta { font-size: 0.76rem; color: var(--muted); margin-bottom: 8px; line-height: 1.4; }
   .card-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-  .card-link {
-    font-size: 0.72rem;
-    font-weight: 500;
-    padding: 3px 9px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    text-decoration: none;
-    transition: background 0.15s;
-  }
+  .card-link { font-size: 0.72rem; font-weight: 500; padding: 3px 9px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-decoration: none; transition: background 0.15s; }
   .card-link:hover { background: var(--border); }
   .card-link.maps { border-color: #4285f4; color: #4285f4; }
   .card-link.web { border-color: var(--accent); color: var(--accent); }
-
   .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
-
-  .tag {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 20px;
-  }
-
+  .tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; }
   .tag-nn { background: var(--green-bg); color: var(--green); }
   .tag-kid { background: #e0f2fe; color: #0369a1; }
   .tag-easy { background: var(--green-bg); color: var(--green); }
   .tag-mod { background: var(--amber-bg); color: var(--amber); }
   .tag-hard { background: var(--red-bg); color: var(--red); }
-
   .btn-row { display: flex; gap: 6px; margin-bottom: 8px; }
-
-  .vote-btn {
-    flex: 1;
-    padding: 7px 0;
-    font-size: 0.82rem;
-    font-weight: 500;
-    font-family: 'DM Sans', sans-serif;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
+  .vote-btn { flex: 1; padding: 7px 0; font-size: 0.82rem; font-weight: 500; font-family: 'DM Sans', sans-serif; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .vote-btn:hover { border-color: var(--text); color: var(--text); }
   .vote-btn.active-yes { background: var(--green-bg); color: var(--green); border-color: var(--green); font-weight: 600; }
   .vote-btn.active-no { background: var(--red-bg); color: var(--red); border-color: var(--red); font-weight: 600; }
-
-  .field-row { display: flex; gap: 6px; margin-bottom: 6px; }
-  .field { flex: 1; }
-  .field-label { font-size: 0.67rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 3px; }
-
-  select.small {
-    font-size: 0.78rem;
-    padding: 5px 6px;
-    border-radius: 6px;
-  }
-
-  textarea {
-    width: 100%;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 6px 8px;
-    resize: none;
-    min-height: 28px;
-    overflow: hidden;
-    line-height: 1.4;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
+  textarea { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; resize: none; min-height: 28px; overflow: hidden; line-height: 1.4; outline: none; transition: border-color 0.15s; margin-bottom: 6px; }
   textarea:focus { border-color: var(--accent); }
-
-  /* votes from others */
-  .other-votes {
-    margin-top: 6px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  .other-vote-pill {
-    font-size: 0.65rem;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
-
+  .other-votes { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .other-vote-pill { font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
   .pill-yes { background: var(--green-bg); color: var(--green); }
   .pill-no { background: var(--red-bg); color: var(--red); }
-
-  /* floating submit */
-  .fab {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 14px 22px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(193,122,58,0.4);
-    transition: opacity 0.15s, transform 0.15s;
-    z-index: 99;
-  }
-
+  .fab { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--accent); color: white; border: none; border-radius: 50px; padding: 14px 22px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 16px rgba(193,122,58,0.4); transition: opacity 0.15s, transform 0.15s; z-index: 99; }
   .fab:hover { opacity: 0.9; transform: translateY(-1px); }
   .fab:active { transform: translateY(0); }
-
-  /* toast */
-  .toast {
-    position: fixed;
-    bottom: 5rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--text);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    opacity: 0;
-    transition: all 0.3s;
-    z-index: 200;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-
+  .toast { position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: white; padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; opacity: 0; transition: all 0.3s; z-index: 200; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .loading { text-align: center; padding: 3rem; color: var(--muted); font-size: 0.9rem; }
+  .tab-bar { display: flex; gap: 0; background: rgba(255,255,255,0.08); border-radius: 8px; padding: 3px; margin-top: 0.75rem; }
+  .tab-btn { flex: 1; padding: 6px 0; font-size: 0.8rem; font-weight: 500; font-family: 'DM Sans', sans-serif; border: none; border-radius: 6px; background: transparent; color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s; }
+  .tab-btn.active { background: white; color: var(--text); font-weight: 600; }
 
-  /* loading */
-  .loading {
-    text-align: center;
-    padding: 3rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
+  /* DASHBOARD — National Park Poster */
+  #dash-content { display: none; background: var(--park-bg); min-height: calc(100vh - 120px); padding-bottom: 4rem; }
 
-  /* ── TABS ── */
-  .tab-bar {
-    display: flex;
-    gap: 0;
-    background: rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 3px;
-    margin-top: 0.75rem;
-  }
-  .tab-btn {
-    flex: 1;
-    padding: 6px 0;
-    font-size: 0.8rem;
-    font-weight: 500;
-    font-family: 'DM Sans', sans-serif;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    color: rgba(255,255,255,0.55);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .tab-btn.active {
-    background: white;
-    color: var(--text);
-    font-weight: 600;
-  }
+  .dash-hero { background: linear-gradient(160deg, #1a2e2a 0%, #0f1f1c 100%); padding: 2rem 1.5rem 1.5rem; border-bottom: 2px solid var(--park-teal); position: relative; overflow: hidden; }
+  .dash-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 50%, rgba(42,157,143,0.12) 0%, transparent 60%); pointer-events: none; }
+  .dash-hero-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; color: var(--park-cream); letter-spacing: 0.02em; line-height: 1.1; margin-bottom: 0.25rem; }
+  .dash-hero-sub { font-size: 0.75rem; color: var(--park-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.25rem; }
+  .dash-hero-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .dash-stat-pill { background: rgba(42,157,143,0.15); border: 1px solid rgba(42,157,143,0.3); border-radius: 20px; padding: 5px 14px; font-size: 0.78rem; color: var(--park-teal); font-weight: 600; }
 
-  /* ── DASHBOARD ── */
-  .dash-refresh {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    padding: 10px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-  }
-  .dash-refresh span { font-size: 0.8rem; color: var(--muted); }
-  .refresh-btn {
-    font-size: 0.8rem;
-    font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .refresh-btn:hover { opacity: 0.7; }
-  .dash-section-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 2rem 0 0.75rem;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-  .dash-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-  }
-  .dash-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 8px;
-  }
-  .dash-name {
-    font-size: 0.92rem;
-    font-weight: 600;
-    flex: 1;
-    color: var(--text);
-  }
-  .dash-day {
-    font-size: 0.7rem;
-    color: var(--muted);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 2px 7px;
-    border-radius: 20px;
-    white-space: nowrap;
-  }
-  .dash-votes {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .dash-col { flex: 1; min-width: 100px; }
-  .dash-col-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 5px;
-  }
-  .dash-col-label.yes { color: var(--green); }
-  .dash-col-label.no { color: var(--red); }
-  .dash-name-pill {
-    display: inline-block;
-    font-size: 0.75rem;
-    padding: 3px 9px;
-    border-radius: 20px;
-    margin: 2px 3px 2px 0;
-    font-weight: 500;
-  }
-  .dash-name-pill.yes { background: var(--green-bg); color: var(--green); }
-  .dash-name-pill.no { background: var(--red-bg); color: var(--red); }
-  .dash-empty { font-size: 0.75rem; color: var(--muted); font-style: italic; }
-  .voter-summary {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 1rem;
-  }
-  .voter-summary-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .voter-pill {
-    display: inline-block;
-    font-size: 0.78rem;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    margin: 2px 3px 2px 0;
-  }
-  .voter-pill-group { color: var(--muted); font-size: 0.7rem; }
+  .dash-controls { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--park-border); }
+  .dash-updated { font-size: 0.72rem; color: var(--park-muted); font-style: italic; }
+  .dash-refresh-btn { font-size: 0.78rem; font-weight: 600; font-family: 'DM Sans', sans-serif; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--park-border); background: transparent; color: var(--park-teal); cursor: pointer; transition: all 0.15s; }
+  .dash-refresh-btn:hover { background: rgba(42,157,143,0.1); }
 
+  .dash-inner { padding: 1.5rem 1rem; max-width: 700px; margin: 0 auto; }
+
+  .dash-section-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--park-muted); margin: 0 0 0.75rem; padding-bottom: 6px; border-bottom: 1px solid var(--park-border); }
+
+  /* Voter cards */
+  .voter-cards { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 2rem; }
+  .voter-card { background: rgba(255,255,255,0.04); border: 1px solid var(--park-border); border-radius: 10px; padding: 12px 14px; flex: 1; min-width: 130px; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .voter-card-name { font-size: 0.88rem; font-weight: 600; color: var(--park-cream); margin-bottom: 2px; }
+  .voter-card-group { font-size: 0.68rem; color: var(--park-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .voter-card-counts { display: flex; gap: 8px; }
+  .voter-count { font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .voter-count-yes { background: rgba(42,157,143,0.2); color: var(--park-teal); }
+  .voter-count-no { background: rgba(193,68,14,0.2); color: #e07050; }
+  .voter-card-vibe { font-size: 0.7rem; color: var(--park-gold); margin-top: 6px; font-style: italic; }
+
+  /* Scoreboard */
+  .score-card { background: rgba(255,255,255,0.04); border: 1px solid var(--park-border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; animation: fadeUp 0.4s ease both; }
+  .score-card.unanimous { border-color: rgba(42,157,143,0.5); }
+  .score-card.rank-1 { border-left: 3px solid var(--park-gold); }
+  .score-card.rank-2 { border-left: 3px solid #b0b8b0; }
+  .score-card.rank-3 { border-left: 3px solid #c17a3a; }
+  .score-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .score-rank { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 900; color: var(--park-muted); min-width: 24px; text-align: center; }
+  .score-rank.gold { color: var(--park-gold); }
+  .score-rank.silver { color: #b0b8b0; }
+  .score-rank.bronze { color: #c17a3a; }
+  .score-name { font-size: 0.9rem; font-weight: 600; color: var(--park-cream); flex: 1; line-height: 1.3; }
+  .score-day { font-size: 0.65rem; color: var(--park-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--park-border); padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+  .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .score-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+  .score-bar-yes { height: 100%; background: var(--park-teal); border-radius: 4px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); width: 0%; }
+  .score-bar-yes.low { background: var(--park-brick); }
+  .score-tally { font-size: 0.72rem; color: var(--park-muted); white-space: nowrap; min-width: 54px; text-align: right; }
+  .score-names { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+  .score-name-pill { font-size: 0.62rem; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
+  .score-name-pill.yes { background: rgba(42,157,143,0.2); color: var(--park-teal); }
+  .score-name-pill.no { background: rgba(193,68,14,0.15); color: #e07050; }
+  .unanimous-badge { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--park-teal); color: var(--park-bg); padding: 2px 7px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+
+  .dash-empty-state { text-align: center; padding: 3rem 1rem; color: var(--park-muted); font-size: 0.9rem; }
+  .dash-empty-state .big { font-size: 2rem; margin-bottom: 0.5rem; }
+
+  #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 300; }
 </style>
 </head>
 <body>
+
+<canvas id="confetti-canvas"></canvas>
 
 <!-- WELCOME SCREEN -->
 <div id="welcome-screen">
@@ -518,12 +175,10 @@
     <div class="emoji">🏔️</div>
     <h1>Yosemite Trip</h1>
     <p>Vote on activities for June 6–13 at Club Wyndham Angels Camp. Enter your name to get started — you can update your votes anytime.</p>
-
     <div class="input-group">
       <label class="input-label" for="voter-name">Your name</label>
       <input type="text" id="voter-name" placeholder="First and last name" autocomplete="name" />
     </div>
-
     <div class="input-group">
       <label class="input-label" for="voter-group">Your group</label>
       <select id="voter-group">
@@ -533,7 +188,6 @@
         <option value="Barrus">Barrus (Jun 10–13)</option>
       </select>
     </div>
-
     <button class="start-btn" onclick="startVoting()">Start Voting →</button>
     <div id="welcome-error" class="error-msg"></div>
   </div>
@@ -544,10 +198,10 @@
   <header>
     <div class="header-top">
       <div>
-        <h1>Yosemite Activity Vote <span style="font-size:0.6rem;font-weight:400;color:rgba(255,255,255,0.4);vertical-align:middle;letter-spacing:0.05em;">v1.5</span></h1>
+        <h1>Yosemite Activity Vote <span style="font-size:0.6rem;font-weight:400;color:rgba(255,255,255,0.4);vertical-align:middle;letter-spacing:0.05em;">v2.0</span></h1>
         <div class="user-info" id="user-display"></div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><button class="switch-btn" onclick="switchUser()">Switch user</button><span style="font-size:0.65rem;color:rgba(255,255,255,0.35);letter-spacing:0.04em;">v1.5</span></div>
+      <button class="switch-btn" onclick="switchUser()">Switch user</button>
     </div>
     <div class="summary-bar">
       <div class="stat"><span class="dot dot-green"></span><span id="yes-count">0</span> yes</div>
@@ -557,7 +211,7 @@
     </div>
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-vote" onclick="switchTab('vote')">🗳️ Vote</button>
-      <button class="tab-btn" id="tab-dash" onclick="switchTab('dashboard')">📊 Dashboard</button>
+      <button class="tab-btn" id="tab-dash" onclick="switchTab('dashboard')">📊 Results</button>
     </div>
   </header>
 
@@ -565,13 +219,20 @@
     <div class="loading">Loading activities...</div>
   </main>
 
-  <main id="dash-content" style="display:none;max-width:700px;margin:0 auto;padding:1.5rem 1rem 4rem;">
-    <div class="dash-refresh">
-      <span id="dash-last-updated">Pull latest votes to see results</span>
-      <button class="refresh-btn" onclick="loadDashboard()">⟳ Refresh</button>
+  <div id="dash-content">
+    <div class="dash-hero">
+      <div class="dash-hero-title">🏕️ Trip Scoreboard</div>
+      <div class="dash-hero-sub">Jun 6–13 · Angels Camp, CA</div>
+      <div class="dash-hero-stats" id="dash-hero-stats"></div>
     </div>
-    <div id="dash-inner"><div class="loading">Click Refresh to load results</div></div>
-  </main>
+    <div class="dash-controls">
+      <span class="dash-updated" id="dash-last-updated">Pull latest votes to see results</span>
+      <button class="dash-refresh-btn" onclick="loadDashboard()">⟳ Refresh</button>
+    </div>
+    <div class="dash-inner" id="dash-inner">
+      <div class="dash-empty-state"><div class="big">🌲</div>Click Refresh to load results</div>
+    </div>
+  </div>
 
   <button class="fab" id="save-fab" onclick="submitAll()">💾 Save All Votes</button>
   <div class="toast" id="toast"></div>
@@ -580,139 +241,68 @@
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynDslND48JzPQi_s5NrxCPJWlpwnZT3Y76UZ5aTwtIsyK9u56PwUO2iScsfHrMEYWI/exec';
 
-const DAYS = ['Select day...','Sat · Jun 6','Sun · Jun 7','Mon · Jun 8','Tue · Jun 9','Wed · Jun 10','Thu · Jun 11','Fri · Jun 12','Sat · Jun 13'];
-const GROUPS = ['Select group...','All groups','Frenzels','Simmons','Barrus','Frenzels + Simmons','Frenzels + Barrus'];
-
 const SECTIONS = [
   { label: 'Whole Group', items: [
-    { id:'grp-dinner', name:'Group dinner night — Murphys', meta:'20 min · $20–40/person · Only full overlap day', day:'Wed · Jun 10', grp:'All groups',
-      maps:'https://maps.google.com/?q=Branding+Iron+Saloon+Murphys+CA',
-      web:'https://www.tripadvisor.com/Restaurant_Search-g32561-Murphys_Calaveras_County_California.html' }
+    { id:'grp-dinner', name:'Group dinner night — Murphys', meta:'20 min · $20–40/person · Only full overlap day', day:'Wed · Jun 10', grp:'All groups', maps:'https://maps.google.com/?q=Branding+Iron+Saloon+Murphys+CA', web:'https://www.tripadvisor.com/Restaurant_Search-g32561-Murphys_Calaveras_County_California.html' }
   ]},
   { label: 'Day Hikes — Local', items: [
-    { id:'natural-bridges', name:'Natural Bridges Trail', tags:['easy–mod'], kids:true, meta:'10 min · 2.1 mi · Free · Cave swim, gets wet', day:'Mon · Jun 9',
-      maps:'https://maps.google.com/?q=Natural+Bridges+Day+Use+Area+Vallecito+CA',
-      web:'https://www.hikespeak.com/trails/upper-natural-bridge-hike-calaveras-county/' },
-    { id:'carson-creek', name:'Carson Creek Trail Loop', tags:['easy'], kids:true, meta:'15 min · 4 mi · Free · Lake views, all fitness', day:'Sun · Jun 7',
-      maps:'https://maps.google.com/?q=Carson+Creek+Trail+New+Melones+CA',
-      web:'https://www.alltrails.com/trail/us/california/carson-creek-trail' },
-    { id:'angels-creek', name:'Angels Creek Trail', tags:['easy'], kids:true, meta:'15 min · 3.4 mi · Free · Serene, dog friendly', day:'Sun · Jun 7',
-      maps:'https://maps.google.com/?q=Angels+Creek+Trail+Angels+Camp+CA',
-      web:'https://www.alltrails.com/trail/us/california/angels-creek-trail' },
-    { id:'mineshaft', name:'Mineshaft Trail — Murphys', tags:['easy–mod'], kids:true, meta:'20 min · 2.8 mi · Free · Old mining road, great views', day:'Mon · Jun 9',
-      maps:'https://maps.google.com/?q=Mineshaft+Trail+Murphys+CA',
-      web:'https://www.alltrails.com/trail/us/california/mineshaft-trail' },
-    { id:'big-trees-north', name:'Calaveras Big Trees — North Grove', tags:['easy'], kids:true, meta:'35 min · 2 mi · ~$10/car · Flat, all ages', day:'Thu · Jun 11',
-      maps:'https://maps.google.com/?q=Calaveras+Big+Trees+State+Park+Arnold+CA',
-      web:'https://www.parks.ca.gov/calaverasbigtrees' },
-    { id:'big-trees-south', name:'Calaveras Big Trees — South Grove', tags:['moderate'], kids:false, meta:'35 min · 5+ mi · ~$10/car · More workout', day:'Thu · Jun 11',
-      maps:'https://maps.google.com/?q=Calaveras+Big+Trees+South+Grove+Arnold+CA',
-      web:'https://www.parks.ca.gov/calaverasbigtrees' },
-    { id:'pinecrest', name:'Pinecrest Lake Loop', tags:['moderate'], kids:true, meta:'60 min · 6+ mi · Free · Lake, waterfall, swim hole', day:'Fri · Jun 12',
-      maps:'https://maps.google.com/?q=Pinecrest+Lake+CA',
-      web:'https://www.alltrails.com/trail/us/california/pinecrest-lake-loop' },
-    { id:'arnold-rim', name:'Arnold Rim Trail', tags:['hard'], kids:false, meta:'26 min · 3.1 mi · Free · 450ft gain, serious hikers', day:'Fri · Jun 12',
-      maps:'https://maps.google.com/?q=Arnold+Rim+Trail+Arnold+CA',
-      web:'https://www.alltrails.com/trail/us/california/arnold-rim-trail' }
+    { id:'natural-bridges', name:'Natural Bridges Trail', tags:['easy–mod'], kids:true, meta:'10 min · 2.1 mi · Free · Cave swim, gets wet', day:'Mon · Jun 9', maps:'https://maps.google.com/?q=Natural+Bridges+Day+Use+Area+Vallecito+CA', web:'https://www.hikespeak.com/trails/upper-natural-bridge-hike-calaveras-county/' },
+    { id:'carson-creek', name:'Carson Creek Trail Loop', tags:['easy'], kids:true, meta:'15 min · 4 mi · Free · Lake views, all fitness', day:'Sun · Jun 7', maps:'https://maps.google.com/?q=Carson+Creek+Trail+New+Melones+CA', web:'https://www.alltrails.com/trail/us/california/carson-creek-trail' },
+    { id:'angels-creek', name:'Angels Creek Trail', tags:['easy'], kids:true, meta:'15 min · 3.4 mi · Free · Serene, dog friendly', day:'Sun · Jun 7', maps:'https://maps.google.com/?q=Angels+Creek+Trail+Angels+Camp+CA', web:'https://www.alltrails.com/trail/us/california/angels-creek-trail' },
+    { id:'mineshaft', name:'Mineshaft Trail — Murphys', tags:['easy–mod'], kids:true, meta:'20 min · 2.8 mi · Free · Old mining road, great views', day:'Mon · Jun 9', maps:'https://maps.google.com/?q=Mineshaft+Trail+Murphys+CA', web:'https://www.alltrails.com/trail/us/california/mineshaft-trail' },
+    { id:'big-trees-north', name:'Calaveras Big Trees — North Grove', tags:['easy'], kids:true, meta:'35 min · 2 mi · ~$10/car · Flat, all ages', day:'Thu · Jun 11', maps:'https://maps.google.com/?q=Calaveras+Big+Trees+State+Park+Arnold+CA', web:'https://www.parks.ca.gov/calaverasbigtrees' },
+    { id:'big-trees-south', name:'Calaveras Big Trees — South Grove', tags:['moderate'], kids:false, meta:'35 min · 5+ mi · ~$10/car · More workout', day:'Thu · Jun 11', maps:'https://maps.google.com/?q=Calaveras+Big+Trees+South+Grove+Arnold+CA', web:'https://www.parks.ca.gov/calaverasbigtrees' },
+    { id:'pinecrest', name:'Pinecrest Lake Loop', tags:['moderate'], kids:true, meta:'60 min · 6+ mi · Free · Lake, waterfall, swim hole', day:'Fri · Jun 12', maps:'https://maps.google.com/?q=Pinecrest+Lake+CA', web:'https://www.alltrails.com/trail/us/california/pinecrest-lake-loop' },
+    { id:'arnold-rim', name:'Arnold Rim Trail', tags:['hard'], kids:false, meta:'26 min · 3.1 mi · Free · 450ft gain, serious hikers', day:'Fri · Jun 12', maps:'https://maps.google.com/?q=Arnold+Rim+Trail+Arnold+CA', web:'https://www.alltrails.com/trail/us/california/arnold-rim-trail' }
   ]},
   { label: 'Day Hikes — Yosemite (2 hrs)', items: [
-    { id:'cooks-meadow', name:"Cook's Meadow Loop", tags:['easy'], kids:true, meta:'2 hrs · 1 mi · Free · Stroller friendly, iconic views', day:'Sat · Jun 7',
-      maps:'https://maps.google.com/?q=Cooks+Meadow+Loop+Yosemite+Valley',
-      web:'https://www.nps.gov/yose/planyourvisit/valleyhikes.htm' },
-    { id:'mirror-lake', name:'Mirror Lake', tags:['easy'], kids:true, meta:'2 hrs · 2–5 mi · Free · Kids can splash and swim', day:'Sat · Jun 7',
-      maps:'https://maps.google.com/?q=Mirror+Lake+Yosemite+National+Park',
-      web:'https://www.nps.gov/yose/planyourvisit/mirrorlake.htm' },
-    { id:'sentinel-dome', name:'Sentinel Dome + Taft Point', tags:['easy–mod'], kids:false, meta:'2 hrs · 2.2 mi each · Free · Epic views', day:'Mon · Jun 9',
-      maps:'https://maps.google.com/?q=Sentinel+Dome+Yosemite',
-      web:'https://www.alltrails.com/trail/us/california/sentinel-dome-trail' },
-    { id:'vernal-falls', name:'Vernal Falls — Mist Trail', tags:['moderate'], kids:false, meta:'2 hrs · 3 mi · Free · Steep, assess kids first', day:'Mon · Jun 9',
-      maps:'https://maps.google.com/?q=Vernal+Falls+Yosemite',
-      web:'https://www.nps.gov/yose/planyourvisit/misttrail.htm' },
-    { id:'glacier-point', name:'Four Mile Trail to Glacier Point', tags:['hard'], kids:false, meta:'2 hrs · 10 mi RT · Free · 3,400ft gain', day:'Fri · Jun 12',
-      maps:'https://maps.google.com/?q=Glacier+Point+Yosemite',
-      web:'https://www.alltrails.com/trail/us/california/four-mile-trail' }
+    { id:'cooks-meadow', name:"Cook's Meadow Loop", tags:['easy'], kids:true, meta:'2 hrs · 1 mi · Free · Stroller friendly, iconic views', day:'Sat · Jun 7', maps:'https://maps.google.com/?q=Cooks+Meadow+Loop+Yosemite+Valley', web:'https://www.nps.gov/yose/planyourvisit/valleyhikes.htm' },
+    { id:'mirror-lake', name:'Mirror Lake', tags:['easy'], kids:true, meta:'2 hrs · 2–5 mi · Free · Kids can splash and swim', day:'Sat · Jun 7', maps:'https://maps.google.com/?q=Mirror+Lake+Yosemite+National+Park', web:'https://www.nps.gov/yose/planyourvisit/mirrorlake.htm' },
+    { id:'sentinel-dome', name:'Sentinel Dome + Taft Point', tags:['easy–mod'], kids:false, meta:'2 hrs · 2.2 mi each · Free · Epic views', day:'Mon · Jun 9', maps:'https://maps.google.com/?q=Sentinel+Dome+Yosemite', web:'https://www.alltrails.com/trail/us/california/sentinel-dome-trail' },
+    { id:'vernal-falls', name:'Vernal Falls — Mist Trail', tags:['moderate'], kids:false, meta:'2 hrs · 3 mi · Free · Steep, assess kids first', day:'Mon · Jun 9', maps:'https://maps.google.com/?q=Vernal+Falls+Yosemite', web:'https://www.nps.gov/yose/planyourvisit/misttrail.htm' },
+    { id:'glacier-point', name:'Four Mile Trail to Glacier Point', tags:['hard'], kids:false, meta:'2 hrs · 10 mi RT · Free · 3,400ft gain', day:'Fri · Jun 12', maps:'https://maps.google.com/?q=Glacier+Point+Yosemite', web:'https://www.alltrails.com/trail/us/california/four-mile-trail' }
   ]},
   { label: 'Kids', items: [
-    { id:'gold-panning', name:'Gold panning — Angels Camp Museum', kids:true, meta:'5 min · ~$10–15/kid', day:'Sun · Jun 8',
-      maps:'https://maps.google.com/?q=Angels+Camp+Museum+Angels+Camp+CA',
-      web:'https://www.angelscamp.gov/museum' },
-    { id:'gem-mining', name:'Gem mining flume — Moaning Cavern', kids:true, meta:'10 min · ~$10–15/kid', day:'Sun · Jun 8',
-      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
-      web:'https://www.caverntours.com/moaning-cavern/' },
-    { id:'angels-museum', name:'Angels Camp Museum', kids:true, meta:'5 min · $10/kid · Gold Rush history, frog jump', day:'Sun · Jun 8',
-      maps:'https://maps.google.com/?q=Angels+Camp+Museum+Angels+Camp+CA',
-      web:'https://www.angelscamp.gov/museum' },
-    { id:'climbing-tower', name:'Climbing tower — Moaning Cavern', kids:true, meta:'10 min · ~$10/kid · ⚠ Verify open', day:'Sun · Jun 8',
-      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
-      web:'https://www.caverntours.com/moaning-cavern/' },
-    { id:'kids-rafting', name:'Little kids rafting', tags:['non-negotiable'], kids:true, meta:'2 hrs · ~$30/person · Book in person Curry Village', day:'Tue · Jun 9',
-      maps:'https://maps.google.com/?q=Curry+Village+Yosemite+Valley',
-      web:'https://www.travelyosemite.com/things-to-do/rafting/' }
+    { id:'gold-panning', name:'Gold panning — Angels Camp Museum', kids:true, meta:'5 min · ~$10–15/kid', day:'Sun · Jun 8', maps:'https://maps.google.com/?q=Angels+Camp+Museum+Angels+Camp+CA', web:'https://www.angelscamp.gov/museum' },
+    { id:'gem-mining', name:'Gem mining flume — Moaning Cavern', kids:true, meta:'10 min · ~$10–15/kid', day:'Sun · Jun 8', maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA', web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'angels-museum', name:'Angels Camp Museum', kids:true, meta:'5 min · $10/kid · Gold Rush history, frog jump', day:'Sun · Jun 8', maps:'https://maps.google.com/?q=Angels+Camp+Museum+Angels+Camp+CA', web:'https://www.angelscamp.gov/museum' },
+    { id:'climbing-tower', name:'Climbing tower — Moaning Cavern', kids:true, meta:'10 min · ~$10/kid · ⚠ Verify open', day:'Sun · Jun 8', maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA', web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'kids-rafting', name:'Little kids rafting', tags:['non-negotiable'], kids:true, meta:'2 hrs · ~$30/person · Book in person Curry Village', day:'Tue · Jun 9', maps:'https://maps.google.com/?q=Curry+Village+Yosemite+Valley', web:'https://www.travelyosemite.com/things-to-do/rafting/' }
   ]},
   { label: 'Adults', items: [
-    { id:'big-rafting', name:'Big kids rafting', tags:['non-negotiable'], meta:'2 hrs · $123–168/person · Book Sierra Mac or ARTA', day:'Fri · Jun 13',
-      maps:'https://maps.google.com/?q=Sierra+Mac+River+Trips+Groveland+CA',
-      web:'https://www.sierramac.com/' },
-    { id:'axe-throwing', name:'Axe throwing — Moaning Cavern', meta:'10 min · $20/lane · Ages 12+', day:'Sun · Jun 8',
-      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
-      web:'https://www.caverntours.com/moaning-cavern/' },
-    { id:'fishing', name:'New Melones Lake fishing', meta:'15 min · ~$20–30 + license', day:'Thu · Jun 12',
-      maps:'https://maps.google.com/?q=New+Melones+Lake+Marina+Jamestown+CA',
-      web:'https://www.newmeloneslakemarina.com/' },
-    { id:'mercer-caverns', name:'Mercer Caverns tour', meta:'20 min · ~$20/adult', day:'Tue · Jun 10',
-      maps:'https://maps.google.com/?q=Mercer+Caverns+Murphys+CA',
-      web:'https://mercercaverns.com/' },
-    { id:'stanislaus', name:'Stanislaus National Forest', meta:'30 min · Free · Hiking, biking, backpacking', day:'Thu · Jun 12',
-      maps:'https://maps.google.com/?q=Stanislaus+National+Forest+CA',
-      web:'https://www.fs.usda.gov/stanislaus' },
-    { id:'ironstone', name:'Ironstone Vineyards', meta:'20 min · $15 tasting · For you only', day:'Tue · Jun 10',
-      maps:'https://maps.google.com/?q=Ironstone+Vineyards+Murphys+CA',
-      web:'https://www.ironstonevineyards.com/' }
+    { id:'big-rafting', name:'Big kids rafting', tags:['non-negotiable'], meta:'2 hrs · $123–168/person · Book Sierra Mac or ARTA', day:'Fri · Jun 13', maps:'https://maps.google.com/?q=Sierra+Mac+River+Trips+Groveland+CA', web:'https://www.sierramac.com/' },
+    { id:'axe-throwing', name:'Axe throwing — Moaning Cavern', meta:'10 min · $20/lane · Ages 12+', day:'Sun · Jun 8', maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA', web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'fishing', name:'New Melones Lake fishing', meta:'15 min · ~$20–30 + license', day:'Thu · Jun 12', maps:'https://maps.google.com/?q=New+Melones+Lake+Marina+Jamestown+CA', web:'https://www.newmeloneslakemarina.com/' },
+    { id:'mercer-caverns', name:'Mercer Caverns tour', meta:'20 min · ~$20/adult', day:'Tue · Jun 10', maps:'https://maps.google.com/?q=Mercer+Caverns+Murphys+CA', web:'https://mercercaverns.com/' },
+    { id:'stanislaus', name:'Stanislaus National Forest', meta:'30 min · Free · Hiking, biking, backpacking', day:'Thu · Jun 12', maps:'https://maps.google.com/?q=Stanislaus+National+Forest+CA', web:'https://www.fs.usda.gov/stanislaus' },
+    { id:'ironstone', name:'Ironstone Vineyards', meta:'20 min · $15 tasting · For you only', day:'Tue · Jun 10', maps:'https://maps.google.com/?q=Ironstone+Vineyards+Murphys+CA', web:'https://www.ironstonevineyards.com/' }
   ]},
   { label: 'Everyone', items: [
-    { id:'moaning-cavern', name:'Moaning Cavern tour', kids:true, meta:'10 min · $14/adult $7/kid · Largest cave in CA', day:'Sun · Jun 8',
-      maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
-      web:'https://www.caverntours.com/moaning-cavern/' },
-    { id:'redwood-forest', name:'Calaveras Big Trees — Redwood Forest day', tags:['non-negotiable'], kids:true, meta:'35 min · ~$10/car · Simmons joins before departing', day:'Wed · Jun 10', grp:'All groups',
-      maps:'https://maps.google.com/?q=Calaveras+Big+Trees+State+Park+Arnold+CA',
-      web:'https://www.parks.ca.gov/calaverasbigtrees' },
-    { id:'melones-swim', name:'New Melones Lake — swim/kayak', kids:true, meta:'15 min · ~$20–30 · 12,500 acre lake', day:'Mon · Jun 9',
-      maps:'https://maps.google.com/?q=New+Melones+Lake+Recreation+Area+CA',
-      web:'https://www.newmeloneslakemarina.com/' },
-    { id:'murphys-evening', name:'Murphys downtown evening', kids:true, meta:'20 min · Free · Pair with group dinner', day:'Wed · Jun 10', grp:'All groups',
-      maps:'https://maps.google.com/?q=Main+Street+Murphys+CA',
-      web:'https://www.visitmurphys.com/' },
-    { id:'disc-golf', name:'Disc golf — Murphys', kids:true, meta:'20 min · Free · All ages', day:'Mon · Jun 9',
-      maps:'https://maps.google.com/?q=Feeney+Park+Murphys+CA',
-      web:'https://www.udisc.com/courses/feeney-park' },
-    { id:'yosemite-bike', name:'Bike Yosemite Valley', kids:true, meta:'2 hrs · ~$65/day rental · Flat, all ages', day:'Sat · Jun 7',
-      maps:'https://maps.google.com/?q=Yosemite+Valley+Bike+Rentals',
-      web:'https://www.travelyosemite.com/things-to-do/bicycling/' },
-    { id:'el-capitan', name:'El Capitan viewpoint', kids:true, meta:'2 hrs · Free · No hiking needed', day:'Sat · Jun 7',
-      maps:'https://maps.google.com/?q=El+Capitan+Viewpoint+Yosemite',
-      web:'https://www.nps.gov/yose/planyourvisit/elcapitan.htm' }
+    { id:'moaning-cavern', name:'Moaning Cavern tour', kids:true, meta:'10 min · $14/adult $7/kid · Largest cave in CA', day:'Sun · Jun 8', maps:'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA', web:'https://www.caverntours.com/moaning-cavern/' },
+    { id:'redwood-forest', name:'Calaveras Big Trees — Redwood Forest day', tags:['non-negotiable'], kids:true, meta:'35 min · ~$10/car · Simmons joins before departing', day:'Wed · Jun 10', grp:'All groups', maps:'https://maps.google.com/?q=Calaveras+Big+Trees+State+Park+Arnold+CA', web:'https://www.parks.ca.gov/calaverasbigtrees' },
+    { id:'melones-swim', name:'New Melones Lake — swim/kayak', kids:true, meta:'15 min · ~$20–30 · 12,500 acre lake', day:'Mon · Jun 9', maps:'https://maps.google.com/?q=New+Melones+Lake+Recreation+Area+CA', web:'https://www.newmeloneslakemarina.com/' },
+    { id:'murphys-evening', name:'Murphys downtown evening', kids:true, meta:'20 min · Free · Pair with group dinner', day:'Wed · Jun 10', grp:'All groups', maps:'https://maps.google.com/?q=Main+Street+Murphys+CA', web:'https://www.visitmurphys.com/' },
+    { id:'disc-golf', name:'Disc golf — Murphys', kids:true, meta:'20 min · Free · All ages', day:'Mon · Jun 9', maps:'https://maps.google.com/?q=Feeney+Park+Murphys+CA', web:'https://www.udisc.com/courses/feeney-park' },
+    { id:'yosemite-bike', name:'Bike Yosemite Valley', kids:true, meta:'2 hrs · ~$65/day rental · Flat, all ages', day:'Sat · Jun 7', maps:'https://maps.google.com/?q=Yosemite+Valley+Bike+Rentals', web:'https://www.travelyosemite.com/things-to-do/bicycling/' },
+    { id:'el-capitan', name:'El Capitan viewpoint', kids:true, meta:'2 hrs · Free · No hiking needed', day:'Sat · Jun 7', maps:'https://maps.google.com/?q=El+Capitan+Viewpoint+Yosemite', web:'https://www.nps.gov/yose/planyourvisit/elcapitan.htm' }
   ]}
 ];
 
 var currentUser = { name: '', group: '' };
-var allVotes = {}; // keyed by activity id → { vote, day, confirmedBy, comments }
-var otherVotes = {}; // keyed by activity id → array of { name, vote }
+var allVotes = {};
+var otherVotes = {};
 
 function startVoting() {
   var name = document.getElementById('voter-name').value.trim();
   var group = document.getElementById('voter-group').value;
   var err = document.getElementById('welcome-error');
-
   if (!name) { err.textContent = 'Please enter your name.'; return; }
   if (!group) { err.textContent = 'Please select your group.'; return; }
-
   currentUser = { name: name, group: group };
   err.textContent = '';
-
   document.getElementById('welcome-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
   document.getElementById('user-display').textContent = name + ' · ' + group;
-
   loadVotes();
 }
 
@@ -728,40 +318,32 @@ function switchUser() {
 
 function loadVotes() {
   setSaveStatus('Loading...');
-
-  // Use JSONP to avoid CORS issues with Google Apps Script
   var callbackName = 'jsonpCallback_' + Date.now();
   var script = document.createElement('script');
-
   window[callbackName] = function(data) {
     delete window[callbackName];
     document.body.removeChild(script);
-
     var myName = currentUser.name.trim().toLowerCase();
     otherVotes = {};
     allVotes = {};
-
     (data.votes || []).forEach(function(v) {
       var isMe = v.name.trim().toLowerCase() === myName;
       if (isMe) {
-        allVotes[v.activity] = { vote: v.vote, day: v.day, confirmedBy: v.confirmedBy, comments: v.comments };
+        allVotes[v.activity] = { vote: v.vote, comments: v.comments };
       } else {
         if (!otherVotes[v.activity]) otherVotes[v.activity] = [];
         otherVotes[v.activity].push({ name: v.name, vote: v.vote });
       }
     });
-
     renderApp();
     setSaveStatus('');
   };
-
   script.onerror = function() {
     delete window[callbackName];
     try { document.body.removeChild(script); } catch(e) {}
     renderApp();
     setSaveStatus('');
   };
-
   script.src = SCRIPT_URL + '?callback=' + callbackName + '&t=' + Date.now();
   document.body.appendChild(script);
 }
@@ -774,16 +356,10 @@ function tagClass(t) {
   return '';
 }
 
-function makeSelect(opts, def, cls, onchange) {
-  return '<select class="' + cls + '" onchange="' + onchange + '">' +
-    opts.map(function(o) { return '<option' + (o === def ? ' selected' : '') + '>' + o + '</option>'; }).join('') +
-    '</select>';
-}
-
 function renderApp() {
   var html = '<div style="background:#fef9f0;border:1px solid #f0d9b5;border-radius:10px;padding:12px 14px;margin-bottom:1.5rem;font-size:0.83rem;line-height:1.6;color:#7a5c2e;">' +
     '<strong style="display:block;margin-bottom:4px;">A note before you vote 👋</strong>' +
-    'No pressure to vote on everything — skip anything you\'re unsure about. This isn\'t the final schedule, just a way for us to see what people are excited about so we can narrow things down and build a plan. The more feedback the better!' +
+    'No pressure to vote on everything — skip anything you\'re unsure about. This isn\'t the final schedule, just a way for us to see what people are excited about!' +
     '</div>';
 
   SECTIONS.forEach(function(sec) {
@@ -791,8 +367,6 @@ function renderApp() {
     sec.items.forEach(function(item) {
       var saved = allVotes[item.id] || {};
       var vote = saved.vote || '';
-      var day = saved.day || item.day;
-      var confirmedBy = saved.confirmedBy || (item.grp || '');
       var comments = saved.comments || '';
       var cardClass = 'card' + (vote === 'yes' ? ' yes' : vote === 'no' ? ' no' : '');
 
@@ -801,13 +375,9 @@ function renderApp() {
 
       var tagHtml = '';
       if (item.tags && item.tags.length) {
-        tagHtml += item.tags.map(function(t) {
-          return '<span class="tag ' + tagClass(t) + '">' + t + '</span>';
-        }).join('');
+        tagHtml += item.tags.map(function(t) { return '<span class="tag ' + tagClass(t) + '">' + t + '</span>'; }).join('');
       }
-      if (item.kids) {
-        tagHtml += '<span class="tag tag-kid">👧 kid-friendly</span>';
-      }
+      if (item.kids) tagHtml += '<span class="tag tag-kid">👧 kid-friendly</span>';
       if (tagHtml) html += '<div class="tags">' + tagHtml + '</div>';
 
       html += '<div class="card-meta">' + item.meta + '</div>';
@@ -824,14 +394,8 @@ function renderApp() {
       html += '<button class="vote-btn' + (vote === 'no' ? ' active-no' : '') + '" onclick="castVote(\'' + item.id + '\',\'no\',this)">✕ No</button>';
       html += '</div>';
 
-      html += '<div class="field-row">';
-      html += '<div class="field"><div class="field-label">Confirmed day</div>' + makeSelect(DAYS, day, 'small', 'updateField(\'' + item.id + '\',\'day\',this.value)') + '</div>';
-      html += '<div class="field"><div class="field-label">Confirmed by</div>' + makeSelect(GROUPS, confirmedBy, 'small', 'updateField(\'' + item.id + '\',\'confirmedBy\',this.value)') + '</div>';
-      html += '</div>';
-
       html += '<textarea placeholder="Comments..." oninput="updateField(\'' + item.id + '\',\'comments\',this.value);this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'">' + comments + '</textarea>';
 
-      // Show other people's votes
       var others = otherVotes[item.id];
       if (others && others.length) {
         html += '<div class="other-votes">';
@@ -855,9 +419,7 @@ function castVote(id, v, btn) {
   var card = document.getElementById('card-' + id);
   var btns = card.querySelectorAll('.vote-btn');
   var already = (allVotes[id] || {}).vote === v;
-
   if (!allVotes[id]) allVotes[id] = {};
-
   if (already) {
     allVotes[id].vote = '';
     card.classList.remove('yes', 'no');
@@ -869,7 +431,6 @@ function castVote(id, v, btn) {
     btns.forEach(function(b) { b.classList.remove('active-yes', 'active-no'); });
     btn.classList.add(v === 'yes' ? 'active-yes' : 'active-no');
   }
-
   updateSummary();
 }
 
@@ -893,9 +454,7 @@ function updateSummary() {
   document.getElementById('pending-count').textContent = total - yes - no;
 }
 
-function setSaveStatus(msg) {
-  document.getElementById('save-status').textContent = msg;
-}
+function setSaveStatus(msg) { document.getElementById('save-status').textContent = msg; }
 
 function showToast(msg) {
   var t = document.getElementById('toast');
@@ -907,7 +466,6 @@ function showToast(msg) {
 function submitAll() {
   setSaveStatus('Saving...');
   var votes = [];
-
   SECTIONS.forEach(function(sec) {
     sec.items.forEach(function(item) {
       var saved = allVotes[item.id] || {};
@@ -917,20 +475,15 @@ function submitAll() {
         group: currentUser.group,
         activity: item.id,
         vote: saved.vote || '',
-        day: saved.day || item.day,
-        confirmedBy: saved.confirmedBy || '',
+        day: item.day,
+        confirmedBy: item.grp || '',
         comments: saved.comments || ''
       });
     });
   });
 
-  if (votes.length === 0) {
-    showToast('No votes to save yet!');
-    setSaveStatus('');
-    return;
-  }
+  if (votes.length === 0) { showToast('No votes to save yet!'); setSaveStatus(''); return; }
 
-  // Bundle all votes and POST via iframe to avoid CORS
   var iframe = document.getElementById('hidden-iframe');
   if (!iframe) {
     iframe = document.createElement('iframe');
@@ -955,7 +508,7 @@ function submitAll() {
 
   iframe.onload = function() {
     setSaveStatus('Saved');
-    showToast('Votes saved!');
+    showToast('Votes saved! 🎉');
     setTimeout(function() { loadVotes(); }, 1500);
   };
 
@@ -967,64 +520,68 @@ function switchTab(tab) {
   var voteMain = document.getElementById('main-content');
   var dashMain = document.getElementById('dash-content');
   var saveFab = document.getElementById('save-fab');
-  var tabVote = document.getElementById('tab-vote');
-  var tabDash = document.getElementById('tab-dash');
-
   if (tab === 'vote') {
     voteMain.style.display = 'block';
     dashMain.style.display = 'none';
     saveFab.style.display = 'block';
-    tabVote.classList.add('active');
-    tabDash.classList.remove('active');
+    document.getElementById('tab-vote').classList.add('active');
+    document.getElementById('tab-dash').classList.remove('active');
   } else {
     voteMain.style.display = 'none';
     dashMain.style.display = 'block';
     saveFab.style.display = 'none';
-    tabVote.classList.remove('active');
-    tabDash.classList.add('active');
+    document.getElementById('tab-vote').classList.remove('active');
+    document.getElementById('tab-dash').classList.add('active');
     loadDashboard();
   }
 }
 
 function loadDashboard() {
-  document.getElementById('dash-inner').innerHTML = '<div class="loading">Loading results...</div>';
-
+  document.getElementById('dash-inner').innerHTML = '<div class="dash-empty-state"><div class="big">🌲</div>Loading results...</div>';
   var callbackName = 'dashCallback_' + Date.now();
   var script = document.createElement('script');
-
   window[callbackName] = function(data) {
     delete window[callbackName];
     try { document.body.removeChild(script); } catch(e) {}
     renderDashboard(data.votes || []);
-    document.getElementById('dash-last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+    document.getElementById('dash-last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
   };
-
   script.onerror = function() {
     delete window[callbackName];
     try { document.body.removeChild(script); } catch(e) {}
-    // Fallback: try regular fetch
     fetch(SCRIPT_URL + '?t=' + Date.now())
       .then(function(r) { return r.json(); })
       .then(function(data) { renderDashboard(data.votes || []); })
       .catch(function() {
-        document.getElementById('dash-inner').innerHTML = '<div class="loading">Could not load — check connection</div>';
+        document.getElementById('dash-inner').innerHTML = '<div class="dash-empty-state"><div class="big">⚠️</div>Could not load — check connection</div>';
       });
   };
-
   script.src = SCRIPT_URL + '?callback=' + callbackName + '&t=' + Date.now();
   document.body.appendChild(script);
 }
 
+var confettiShown = false;
+
 function renderDashboard(votes) {
-  // Get all unique voters
+  // Client-side dedup: keep first seen per name+activity
+  var seen = {};
+  var deduped = [];
+  votes.forEach(function(v) {
+    var key = v.name.trim().toLowerCase() + '|' + v.activity;
+    if (!seen[key]) { seen[key] = true; deduped.push(v); }
+  });
+  votes = deduped;
+
+  // Voter stats
   var allVoters = {};
   votes.forEach(function(v) {
-    if (!allVoters[v.name.toLowerCase()]) {
-      allVoters[v.name.toLowerCase()] = { name: v.name, group: v.group };
-    }
+    var key = v.name.trim().toLowerCase();
+    if (!allVoters[key]) allVoters[key] = { name: v.name, group: v.group, yes: 0, no: 0 };
+    if (v.vote === 'yes') allVoters[key].yes++;
+    else if (v.vote === 'no') allVoters[key].no++;
   });
 
-  // Build vote map: activity -> { yes: [names], no: [names] }
+  // Vote map
   var voteMap = {};
   votes.forEach(function(v) {
     if (!voteMap[v.activity]) voteMap[v.activity] = { yes: [], no: [] };
@@ -1032,65 +589,133 @@ function renderDashboard(votes) {
     else if (v.vote === 'no') voteMap[v.activity].no.push(v.name);
   });
 
-  var voterCount = Object.keys(allVoters).length;
-  var html = '';
-
-  // Voter summary
-  if (voterCount > 0) {
-    html += '<div class="voter-summary">';
-    html += '<div class="voter-summary-label">' + voterCount + ' ' + (voterCount === 1 ? 'person has' : 'people have') + ' voted</div>';
-    html += '<div>';
-    Object.values(allVoters).forEach(function(v) {
-      html += '<span class="voter-pill">' + v.name + ' <span class="voter-pill-group">· ' + v.group + '</span></span>';
-    });
-    html += '</div></div>';
-  }
-
+  // Scored list — only activities with at least one vote
+  var scored = [];
   SECTIONS.forEach(function(sec) {
-    html += '<div class="dash-section-label">' + sec.label + '</div>';
     sec.items.forEach(function(item) {
-      var vm = voteMap[item.id] || { yes: [], no: [] };
-      var yesCount = vm.yes.length;
-      var noCount = vm.no.length;
-
-      html += '<div class="dash-card">';
-      html += '<div class="dash-card-top">';
-      html += '<span class="dash-name">' + item.name + '</span>';
-      html += '<span class="dash-day">' + item.day + '</span>';
-      html += '</div>';
-      html += '<div class="dash-votes">';
-
-      // Yes column
-      html += '<div class="dash-col">';
-      html += '<div class="dash-col-label yes">Yes (' + yesCount + ')</div>';
-      if (vm.yes.length) {
-        vm.yes.forEach(function(n) {
-          html += '<span class="dash-name-pill yes">' + n + '</span>';
-        });
-      } else {
-        html += '<span class="dash-empty">none yet</span>';
-      }
-      html += '</div>';
-
-      // No column
-      html += '<div class="dash-col">';
-      html += '<div class="dash-col-label no">No (' + noCount + ')</div>';
-      if (vm.no.length) {
-        vm.no.forEach(function(n) {
-          html += '<span class="dash-name-pill no">' + n + '</span>';
-        });
-      } else {
-        html += '<span class="dash-empty">none yet</span>';
-      }
-      html += '</div>';
-
-      html += '</div></div>';
+      var vm = voteMap[item.id];
+      if (!vm || (vm.yes.length === 0 && vm.no.length === 0)) return;
+      scored.push({ id: item.id, name: item.name, day: item.day, yes: vm.yes, no: vm.no, total: vm.yes.length + vm.no.length });
     });
   });
 
+  scored.sort(function(a, b) {
+    if (b.yes.length !== a.yes.length) return b.yes.length - a.yes.length;
+    var ra = a.total ? a.yes.length / a.total : 0;
+    var rb = b.total ? b.yes.length / b.total : 0;
+    return rb - ra;
+  });
+
+  var voterCount = Object.keys(allVoters).length;
+  var unanimousCount = scored.filter(function(s) { return s.no.length === 0 && s.yes.length >= 2; }).length;
+
+  // Hero stats
+  var statsHtml = '';
+  if (voterCount > 0) statsHtml += '<div class="dash-stat-pill">👥 ' + voterCount + ' voter' + (voterCount !== 1 ? 's' : '') + '</div>';
+  if (scored.length > 0) statsHtml += '<div class="dash-stat-pill">🗳️ ' + scored.length + ' activities voted on</div>';
+  if (unanimousCount > 0) statsHtml += '<div class="dash-stat-pill">✅ ' + unanimousCount + ' unanimous</div>';
+  document.getElementById('dash-hero-stats').innerHTML = statsHtml;
+
+  var html = '';
+
+  // Voter cards
+  if (voterCount > 0) {
+    html += '<div class="dash-section-title">Who\'s voted</div>';
+    html += '<div class="voter-cards">';
+    Object.values(allVoters).forEach(function(v, i) {
+      var vibe = '';
+      if (v.yes >= 12) vibe = '🎒 Down for everything';
+      else if (v.no > v.yes * 2) vibe = '🧐 Being selective';
+      else if (v.yes >= 6) vibe = '🙌 Very enthusiastic';
+      else if (v.yes >= 3) vibe = '😄 Getting excited';
+      else if (v.yes > 0) vibe = '🤔 Taking it easy';
+      html += '<div class="voter-card" style="animation-delay:' + (i * 0.08) + 's">';
+      html += '<div class="voter-card-name">' + v.name + '</div>';
+      html += '<div class="voter-card-group">' + v.group + '</div>';
+      html += '<div class="voter-card-counts"><span class="voter-count voter-count-yes">✓ ' + v.yes + '</span><span class="voter-count voter-count-no">✕ ' + v.no + '</span></div>';
+      if (vibe) html += '<div class="voter-card-vibe">' + vibe + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Scoreboard
+  if (scored.length === 0) {
+    html += '<div class="dash-empty-state"><div class="big">🌲</div>No votes yet — be the first!</div>';
+  } else {
+    html += '<div class="dash-section-title">Activity Scoreboard</div>';
+    scored.forEach(function(s, i) {
+      var pct = s.total > 0 ? Math.round((s.yes.length / s.total) * 100) : 0;
+      var isUnanimous = s.no.length === 0 && s.yes.length >= 2;
+      var rankClass = i === 0 ? ' rank-1' : i === 1 ? ' rank-2' : i === 2 ? ' rank-3' : '';
+      var rankColor = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+
+      html += '<div class="score-card' + (isUnanimous ? ' unanimous' : '') + rankClass + '" style="animation-delay:' + (i * 0.04) + 's">';
+      html += '<div class="score-card-top">';
+      html += '<span class="score-rank ' + rankColor + '">' + (i + 1) + '</span>';
+      html += '<span class="score-name">' + s.name + (isUnanimous ? '<span class="unanimous-badge">unanimous</span>' : '') + '</span>';
+      html += '<span class="score-day">' + s.day + '</span>';
+      html += '</div>';
+      html += '<div class="score-bar-wrap">';
+      html += '<div class="score-bar-track"><div class="score-bar-yes' + (pct < 40 ? ' low' : '') + '" data-pct="' + pct + '" style="width:0%"></div></div>';
+      html += '<span class="score-tally">' + s.yes.length + ' yes · ' + s.no.length + ' no</span>';
+      html += '</div>';
+      html += '<div class="score-names">';
+      s.yes.forEach(function(n) { html += '<span class="score-name-pill yes">✓ ' + n + '</span>'; });
+      s.no.forEach(function(n) { html += '<span class="score-name-pill no">✕ ' + n + '</span>'; });
+      html += '</div></div>';
+    });
+  }
+
   document.getElementById('dash-inner').innerHTML = html;
+
+  // Animate bars
+  requestAnimationFrame(function() {
+    setTimeout(function() {
+      document.querySelectorAll('.score-bar-yes').forEach(function(el) {
+        el.style.width = el.getAttribute('data-pct') + '%';
+      });
+    }, 100);
+  });
+
+  // Confetti for unanimous consensus
+  if (unanimousCount >= 3 && voterCount >= 3 && !confettiShown) {
+    confettiShown = true;
+    launchConfetti();
+  }
 }
 
+function launchConfetti() {
+  var canvas = document.getElementById('confetti-canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  var colors = ['#2a9d8f','#e9c46a','#c1440e','#f4e9d0','#264653','#a8dadc'];
+  var pieces = Array.from({length: 130}, function() {
+    return { x: Math.random() * canvas.width, y: -20 - Math.random() * 120, w: 7 + Math.random() * 9, h: 3 + Math.random() * 5, color: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.12, vx: (Math.random() - 0.5) * 3, vy: 1.8 + Math.random() * 3, opacity: 1 };
+  });
+  var frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var alive = false;
+    pieces.forEach(function(p) {
+      p.x += p.vx; p.y += p.vy; p.rot += p.rotSpeed;
+      if (frame > 80) p.opacity -= 0.012;
+      if (p.opacity > 0 && p.y < canvas.height + 20) alive = true;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (alive) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
+}
 </script>
 </body>
 </html>
