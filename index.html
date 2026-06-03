@@ -133,6 +133,68 @@
   .dash-bar-conflict { height: 100%; background: #c1440e; border-radius: 3px; transition: width 0.6s ease; }
   .dash-bar-change { height: 100%; background: #e9c46a; border-radius: 3px; transition: width 0.6s ease; }
   .dash-empty { text-align: center; padding: 3rem; color: #7a9e96; font-size: 0.9rem; }
+
+  /* LOGISTICS TAB */
+  #logistics-content { display: none; max-width: 700px; margin: 0 auto; padding: 1.5rem 1rem 5rem; }
+
+  .logistics-intro { background: #fef9f0; border: 1px solid #f0d9b5; border-radius: 10px; padding: 12px 14px; margin-bottom: 1.5rem; font-size: 0.83rem; line-height: 1.6; color: #7a5c2e; }
+  .logistics-intro strong { display: block; margin-bottom: 4px; }
+
+  .logistics-group-label {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 2rem 0 0.75rem; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+
+  .traveler-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    margin-bottom: 10px; overflow: hidden;
+  }
+  .traveler-card.mine { border-color: var(--accent); border-left: 4px solid var(--accent); }
+  .traveler-card.confirmed { border-color: var(--green); border-left: 4px solid var(--green); }
+
+  .traveler-header {
+    padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; user-select: none;
+  }
+  .traveler-header:hover { background: var(--bg); }
+
+  .traveler-name-row { display: flex; align-items: center; gap: 8px; }
+  .traveler-name { font-size: 0.9rem; font-weight: 600; }
+  .traveler-group-pill { font-size: 0.62rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+  .tpill-fren { background: #e6f1fb; color: #185fa5; }
+  .tpill-sim { background: #faeeda; color: #854f0b; }
+  .tpill-bar { background: #faece7; color: #993c1d; }
+
+  .traveler-status-row { display: flex; align-items: center; gap: 6px; }
+  .traveler-summary { font-size: 0.72rem; color: var(--muted); text-align: right; line-height: 1.4; }
+  .traveler-chevron { font-size: 0.7rem; color: var(--muted); margin-left: 4px; transition: transform 0.2s; }
+  .traveler-card.open .traveler-chevron { transform: rotate(180deg); }
+
+  .traveler-body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
+  .traveler-card.open .traveler-body { display: block; }
+
+  .log-field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .log-field { display: flex; flex-direction: column; gap: 3px; }
+  .log-field.full { grid-column: 1 / -1; }
+  .log-label { font-size: 0.67rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .log-input { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; outline: none; transition: border-color 0.15s; width: 100%; }
+  .log-input:focus { border-color: var(--accent); }
+  .log-input[readonly] { opacity: 0.65; cursor: default; }
+  .log-textarea { resize: none; min-height: 28px; overflow: hidden; line-height: 1.4; }
+
+  .log-confirmed-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.7rem; font-weight: 600; color: var(--green);
+    background: var(--green-bg); border: 1px solid var(--green); border-radius: 20px;
+    padding: 2px 8px; margin-top: 8px;
+  }
+
+  .log-edit-btn {
+    margin-top: 8px; font-size: 0.78rem; font-weight: 500; font-family: 'DM Sans', sans-serif;
+    padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); cursor: pointer; transition: opacity 0.15s;
+  }
+  .log-edit-btn:hover { opacity: 0.7; }
 </style>
 </head>
 <body>
@@ -175,6 +237,7 @@
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-sched" onclick="switchTab('schedule')">📅 Schedule</button>
       <button class="tab-btn" id="tab-dash" onclick="switchTab('dashboard')">📊 Responses</button>
+      <button class="tab-btn" id="tab-log" onclick="switchTab('logistics')">🚗 Logistics</button>
     </div>
   </header>
 
@@ -194,7 +257,10 @@
   </div>
 
   <button class="fab" id="save-fab" onclick="submitAll()">💾 Save Responses</button>
+  <button class="fab" id="log-fab" style="display:none" onclick="submitLogistics()">💾 Save My Info</button>
   <div class="toast" id="toast"></div>
+
+  <div id="logistics-content"></div>
 </div>
 
 <script>
@@ -629,20 +695,33 @@ function submitAll() {
 function switchTab(tab) {
   var schedMain = document.getElementById('main-content');
   var dashMain = document.getElementById('dash-content');
+  var logMain = document.getElementById('logistics-content');
   var fab = document.getElementById('save-fab');
+  var logFab = document.getElementById('log-fab');
+
+  schedMain.style.display = 'none';
+  dashMain.style.display = 'none';
+  logMain.style.display = 'none';
+  fab.style.display = 'none';
+  logFab.style.display = 'none';
+
+  document.getElementById('tab-sched').classList.remove('active');
+  document.getElementById('tab-dash').classList.remove('active');
+  document.getElementById('tab-log').classList.remove('active');
+
   if (tab === 'schedule') {
     schedMain.style.display = 'block';
-    dashMain.style.display = 'none';
     fab.style.display = 'block';
     document.getElementById('tab-sched').classList.add('active');
-    document.getElementById('tab-dash').classList.remove('active');
-  } else {
-    schedMain.style.display = 'none';
+  } else if (tab === 'dashboard') {
     dashMain.style.display = 'block';
-    fab.style.display = 'none';
-    document.getElementById('tab-sched').classList.remove('active');
     document.getElementById('tab-dash').classList.add('active');
     loadDashboard();
+  } else if (tab === 'logistics') {
+    logMain.style.display = 'block';
+    logFab.style.display = 'block';
+    document.getElementById('tab-log').classList.add('active');
+    loadLogistics();
   }
 }
 
@@ -728,6 +807,201 @@ function renderDashboard(responses) {
 
   document.getElementById('dash-inner').innerHTML = html;
 }
+// ── LOGISTICS ──────────────────────────────────────────────────
+
+var TRAVELERS = [
+  // Frenzels
+  { id: 'ben-alicia-greg-owen', names: 'Ben, Alicia, Greg, Owen', group: 'Frenzels',
+    arrival: { date: 'Sat Jun 6', time: '~4:15 PM', method: 'Flight AA2634 DFW→SMF', notes: 'Conf: CNXUQO · Land 1:41 PM Sacramento' },
+    departure: { date: 'Sat Jun 13', time: '11:45 PM', method: 'Flight AA3314 SMF→DFW', notes: '' },
+    locked: true },
+  { id: 'brianna', names: 'Brianna', group: 'Frenzels',
+    arrival: { date: 'Sat Jun 6', time: '~9:00 PM', method: 'Flight AA651 DFW→SMF', notes: 'Conf: LUVAVK · Land 6:23 PM Sacramento' },
+    departure: { date: 'Sat Jun 13', time: '11:45 PM', method: 'Flight SMF→DFW', notes: '' },
+    locked: true },
+  { id: 'sam', names: 'Sam', group: 'Frenzels', arrival: {}, departure: {}, locked: false },
+  { id: 'hal-hunter', names: 'Hal + Hunter', group: 'Frenzels', arrival: {}, departure: {}, locked: false },
+  { id: 'seth-nina', names: 'Seth + Nina', group: 'Frenzels', arrival: {}, departure: {}, locked: false },
+  // Simmons
+  { id: 'simmons', names: 'Rebecca, Russ, Rosalyn + kids', group: 'Simmons', arrival: { date: 'Sat Jun 6', time: '', method: 'Driving (local)', notes: '' }, departure: { date: 'Wed Jun 10', time: '', method: 'Driving (local)', notes: '' }, locked: false },
+  // Barrus
+  { id: 'wendy-lily', names: 'Wendy + Lily', group: 'Barrus', arrival: {}, departure: {}, locked: false },
+  { id: 'joe-justin', names: 'Joe + Justin', group: 'Barrus', arrival: {}, departure: {}, locked: false },
+  { id: 'jared-kaylee', names: 'Jared + Kaylee', group: 'Barrus', arrival: { notes: 'Possible — TBC' }, departure: {}, locked: false }
+];
+
+var logisticsData = {}; // id → { arrDate, arrTime, arrMethod, arrNotes, depDate, depTime, depMethod, depNotes }
+
+function loadLogistics() {
+  var cb = 'logCb_' + Date.now();
+  var script = document.createElement('script');
+  window[cb] = function(data) {
+    delete window[cb];
+    try { document.body.removeChild(script); } catch(e) {}
+    (data.logistics || []).forEach(function(r) {
+      logisticsData[r.id] = r;
+    });
+    renderLogistics();
+  };
+  script.onerror = function() {
+    delete window[cb];
+    try { document.body.removeChild(script); } catch(e) {}
+    renderLogistics();
+  };
+  script.src = SCRIPT_URL + '?type=logistics&callback=' + cb + '&t=' + Date.now();
+  document.body.appendChild(script);
+}
+
+function renderLogistics() {
+  var myName = currentUser.name.trim().toLowerCase();
+
+  // Find which traveler card belongs to the current user
+  var myTravelerId = null;
+  TRAVELERS.forEach(function(t) {
+    var names = t.names.toLowerCase();
+    // Check if any word in the traveler names matches the user's first name
+    var userFirst = myName.split(' ')[0];
+    if (names.indexOf(userFirst) !== -1) myTravelerId = t.id;
+  });
+
+  var groups = ['Frenzels', 'Simmons', 'Barrus'];
+  var html = '<div class="logistics-intro"><strong>🚗 Travel & Arrival Info</strong>Help the group coordinate pickups, timing, and carpools. Fill in your own arrival details — locked entries are already confirmed.</div>';
+
+  groups.forEach(function(grp) {
+    var travelers = TRAVELERS.filter(function(t) { return t.group === grp; });
+    html += '<div class="logistics-group-label">' + grp;
+    if (grp === 'Simmons') html += ' · Jun 6–10';
+    if (grp === 'Barrus') html += ' · Jun 10–13';
+    html += '</div>';
+
+    travelers.forEach(function(t) {
+      var saved = logisticsData[t.id] || {};
+      var isMe = t.id === myTravelerId;
+      var hasData = t.locked || saved.arrDate || saved.arrTime || saved.arrMethod;
+      var cardClass = 'traveler-card' + (isMe ? ' mine' : hasData ? ' confirmed' : '') + (isMe ? ' open' : '');
+
+      // Pill color
+      var pillClass = grp === 'Frenzels' ? 'tpill-fren' : grp === 'Simmons' ? 'tpill-sim' : 'tpill-bar';
+
+      // Summary line for collapsed view
+      var arrDisplay = t.locked ? (t.arrival.time || '') : (saved.arrTime || '');
+      var arrDate = t.locked ? (t.arrival.date || '') : (saved.arrDate || '');
+      var summaryHtml = '';
+      if (arrDate || arrDisplay) {
+        summaryHtml = '<div class="traveler-summary">' + (arrDate ? arrDate + '<br>' : '') + (arrDisplay ? 'Arrives ' + arrDisplay : '') + '</div>';
+      } else {
+        summaryHtml = '<div class="traveler-summary" style="color:var(--amber)">TBD</div>';
+      }
+
+      html += '<div class="traveler-card' + (isMe ? ' mine open' : hasData ? ' confirmed' : '') + '" id="tcard-' + t.id + '">';
+      html += '<div class="traveler-header" onclick="toggleTraveler(\'' + t.id + '\')">';
+      html += '<div class="traveler-name-row">';
+      html += '<span class="traveler-name">' + t.names + '</span>';
+      html += '<span class="traveler-group-pill ' + pillClass + '">' + grp + '</span>';
+      if (t.locked) html += '<span style="font-size:0.65rem;color:var(--green);">✓ confirmed</span>';
+      html += '</div>';
+      html += '<div class="traveler-status-row">' + summaryHtml + '<span class="traveler-chevron">▼</span></div>';
+      html += '</div>'; // traveler-header
+
+      html += '<div class="traveler-body">';
+
+      if (t.locked) {
+        // Read-only confirmed entry
+        html += '<div class="log-field-grid">';
+        html += '<div class="log-field"><div class="log-label">Arrival date</div><input class="log-input" readonly value="' + (t.arrival.date || '') + '"></div>';
+        html += '<div class="log-field"><div class="log-label">Arrival time</div><input class="log-input" readonly value="' + (t.arrival.time || '') + '"></div>';
+        html += '<div class="log-field full"><div class="log-label">Travel method</div><input class="log-input" readonly value="' + (t.arrival.method || '') + '"></div>';
+        if (t.arrival.notes) html += '<div class="log-field full"><div class="log-label">Notes</div><input class="log-input" readonly value="' + (t.arrival.notes || '') + '"></div>';
+        html += '<div class="log-field"><div class="log-label">Departure date</div><input class="log-input" readonly value="' + (t.departure.date || '') + '"></div>';
+        html += '<div class="log-field"><div class="log-label">Departure time</div><input class="log-input" readonly value="' + (t.departure.time || '') + '"></div>';
+        html += '</div>';
+        html += '<div class="log-confirmed-badge">✓ Pre-confirmed from flight info</div>';
+
+      } else if (isMe) {
+        // Editable fields for current user
+        var d = saved;
+        html += '<div class="log-field-grid">';
+        html += '<div class="log-field"><div class="log-label">Arrival date</div><input class="log-input" id="log-arrDate-' + t.id + '" placeholder="e.g. Sat Jun 6" value="' + (d.arrDate || t.arrival.date || '') + '" oninput="logField(\'' + t.id + '\',\'arrDate\',this.value)"></div>';
+        html += '<div class="log-field"><div class="log-label">Arrival time</div><input class="log-input" id="log-arrTime-' + t.id + '" placeholder="e.g. 4:00 PM" value="' + (d.arrTime || t.arrival.time || '') + '" oninput="logField(\'' + t.id + '\',\'arrTime\',this.value)"></div>';
+        html += '<div class="log-field full"><div class="log-label">Travel method</div><input class="log-input" id="log-arrMethod-' + t.id + '" placeholder="Flying, driving, etc." value="' + (d.arrMethod || t.arrival.method || '') + '" oninput="logField(\'' + t.id + '\',\'arrMethod\',this.value)"></div>';
+        html += '<div class="log-field full"><div class="log-label">Arrival notes</div><textarea class="log-input log-textarea" id="log-arrNotes-' + t.id + '" placeholder="Flight #, pickup needed, etc." oninput="logField(\'' + t.id + '\',\'arrNotes\',this.value);this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'">' + (d.arrNotes || t.arrival.notes || '') + '</textarea></div>';
+        html += '<div class="log-field"><div class="log-label">Departure date</div><input class="log-input" id="log-depDate-' + t.id + '" placeholder="e.g. Sat Jun 13" value="' + (d.depDate || t.departure.date || '') + '" oninput="logField(\'' + t.id + '\',\'depDate\',this.value)"></div>';
+        html += '<div class="log-field"><div class="log-label">Departure time</div><input class="log-input" id="log-depTime-' + t.id + '" placeholder="e.g. 11:45 PM" value="' + (d.depTime || t.departure.time || '') + '" oninput="logField(\'' + t.id + '\',\'depTime\',this.value)"></div>';
+        html += '<div class="log-field full"><div class="log-label">Departure notes</div><textarea class="log-input log-textarea" id="log-depNotes-' + t.id + '" placeholder="Drop-off, carpool, etc." oninput="logField(\'' + t.id + '\',\'depNotes\',this.value);this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'">' + (d.depNotes || t.departure.notes || '') + '</textarea></div>';
+        html += '</div>';
+
+      } else {
+        // Read-only saved data from sheet, or empty
+        var d = saved;
+        var hasAny = d.arrDate || d.arrTime || d.arrMethod || t.arrival.date || t.arrival.method;
+        if (hasAny) {
+          html += '<div class="log-field-grid">';
+          if (d.arrDate || t.arrival.date) html += '<div class="log-field"><div class="log-label">Arrival date</div><input class="log-input" readonly value="' + (d.arrDate || t.arrival.date || '') + '"></div>';
+          if (d.arrTime || t.arrival.time) html += '<div class="log-field"><div class="log-label">Arrival time</div><input class="log-input" readonly value="' + (d.arrTime || t.arrival.time || '') + '"></div>';
+          if (d.arrMethod || t.arrival.method) html += '<div class="log-field full"><div class="log-label">Travel method</div><input class="log-input" readonly value="' + (d.arrMethod || t.arrival.method || '') + '"></div>';
+          if (d.arrNotes || t.arrival.notes) html += '<div class="log-field full"><div class="log-label">Notes</div><input class="log-input" readonly value="' + (d.arrNotes || t.arrival.notes || '') + '"></div>';
+          if (d.depDate || t.departure.date) html += '<div class="log-field"><div class="log-label">Departure date</div><input class="log-input" readonly value="' + (d.depDate || t.departure.date || '') + '"></div>';
+          if (d.depTime || t.departure.time) html += '<div class="log-field"><div class="log-label">Departure time</div><input class="log-input" readonly value="' + (d.depTime || t.departure.time || '') + '"></div>';
+          html += '</div>';
+        } else {
+          html += '<div style="font-size:0.8rem;color:var(--muted);padding:8px 0;font-style:italic;">No info submitted yet</div>';
+        }
+        if (t.arrival.notes && !hasAny) html += '<div style="font-size:0.75rem;color:var(--amber);margin-top:4px;">' + t.arrival.notes + '</div>';
+      }
+
+      html += '</div>'; // traveler-body
+      html += '</div>'; // traveler-card
+    });
+  });
+
+  document.getElementById('logistics-content').innerHTML = html;
+}
+
+function toggleTraveler(id) {
+  var card = document.getElementById('tcard-' + id);
+  card.classList.toggle('open');
+}
+
+function logField(id, field, value) {
+  if (!logisticsData[id]) logisticsData[id] = {};
+  logisticsData[id][field] = value;
+}
+
+function submitLogistics() {
+  var myName = currentUser.name.trim().toLowerCase();
+  var myTravelerId = null;
+  TRAVELERS.forEach(function(t) {
+    var userFirst = myName.split(' ')[0];
+    if (t.names.toLowerCase().indexOf(userFirst) !== -1) myTravelerId = t.id;
+  });
+
+  if (!myTravelerId) { showToast('Could not find your entry'); return; }
+
+  var d = logisticsData[myTravelerId] || {};
+  var payload = {
+    type: 'logistics',
+    id: myTravelerId,
+    names: currentUser.name,
+    group: currentUser.group,
+    arrDate: d.arrDate || '', arrTime: d.arrTime || '',
+    arrMethod: d.arrMethod || '', arrNotes: d.arrNotes || '',
+    depDate: d.depDate || '', depTime: d.depTime || '',
+    depMethod: d.depMethod || '', depNotes: d.depNotes || ''
+  };
+
+  var iframe = document.getElementById('hidden-iframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.name = 'hidden-iframe'; iframe.id = 'hidden-iframe'; iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
+  var form = document.createElement('form');
+  form.method = 'POST'; form.action = SCRIPT_URL; form.target = 'hidden-iframe'; form.style.display = 'none';
+  var input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'payload'; input.value = JSON.stringify(payload);
+  form.appendChild(input); document.body.appendChild(form);
+  iframe.onload = function() { showToast('Travel info saved! 🚗'); setTimeout(function() { loadLogistics(); }, 1200); };
+  form.submit();
+  document.body.removeChild(form);
+}
 </script>
-</body>
-</html>
