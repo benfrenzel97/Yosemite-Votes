@@ -77,9 +77,18 @@
   .day-activities { padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 5px; }
   .activity-row { display: flex; gap: 8px; align-items: flex-start; }
   .activity-time { font-size: 0.7rem; color: var(--muted); min-width: 52px; padding-top: 2px; font-weight: 500; }
-  .activity-name { font-size: 0.82rem; color: var(--text); line-height: 1.4; flex: 1; }
+  .activity-body { flex: 1; }
+  .activity-name { font-size: 0.82rem; color: var(--text); line-height: 1.4; font-weight: 500; }
   .activity-name .opt { font-size: 0.68rem; color: var(--muted); font-style: italic; margin-left: 4px; }
   .activity-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; background: var(--border); }
+  .activity-detail { font-size: 0.75rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .activity-dist { font-size: 0.7rem; color: var(--accent); font-weight: 500; margin-top: 2px; }
+  .activity-address { font-size: 0.7rem; color: var(--muted); margin-top: 1px; font-style: italic; }
+  .activity-links { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+  .activity-link { font-size: 0.68rem; font-weight: 500; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-decoration: none; transition: background 0.15s; }
+  .activity-link:hover { background: var(--border); }
+  .activity-link.maps { border-color: #4285f4; color: #4285f4; }
+  .activity-link.web { border-color: var(--accent); color: var(--accent); }
 
   .day-card-footer { padding: 10px 14px 12px; border-top: 1px solid var(--border); }
 
@@ -208,9 +217,34 @@ const SCHEDULE = [
     subtitle: 'Yosemite day 1',
     groups: ['fren', 'sim'],
     activities: [
-      { time: 'Morning', name: 'Mirror Lake — Half Dome views, kids can splash' },
-      { time: 'Optional', name: 'Bike Yosemite Valley (~$65/bike)', opt: true },
-      { time: 'Afternoon', name: 'El Capitan viewpoint — easy stop on drive back' }
+      {
+        time: 'Morning',
+        name: 'Mirror Lake',
+        detail: 'Half Dome views, kids can splash · Free · 2–5 mi',
+        dist: '~85 mi · 2 hrs 10 min',
+        address: 'Mirror Lake Trailhead, Yosemite Valley, CA 95389',
+        maps: 'https://maps.google.com/?q=Mirror+Lake+Yosemite+National+Park',
+        web: 'https://www.nps.gov/yose/planyourvisit/mirrorlake.htm'
+      },
+      {
+        time: 'Optional',
+        name: 'Bike Yosemite Valley',
+        detail: '~$65/day rental · Flat, all ages · 2 hrs · Same area as Mirror Lake',
+        dist: '~83 mi · 2 hrs',
+        address: 'Curry Village Bike Stand, Yosemite Valley, CA 95389',
+        maps: 'https://maps.google.com/?q=Yosemite+Valley+Bike+Rentals',
+        web: 'https://www.travelyosemite.com/things-to-do/bicycling/',
+        opt: true
+      },
+      {
+        time: 'Afternoon',
+        name: 'El Capitan viewpoint',
+        detail: 'Free · No hiking needed · Easy stop on drive back',
+        dist: '~80 mi · 1 hr 55 min',
+        address: 'El Capitan Meadow, Yosemite Valley, CA 95389',
+        maps: 'https://maps.google.com/?q=El+Capitan+Viewpoint+Yosemite',
+        web: 'https://www.nps.gov/yose/planyourvisit/elcapitan.htm'
+      }
     ]
   },
   {
@@ -219,9 +253,33 @@ const SCHEDULE = [
     subtitle: 'Local activities day',
     groups: ['fren', 'sim'],
     activities: [
-      { time: 'Morning', name: 'Carson Creek Trail Loop — 4 mi, all fitness levels' },
-      { time: 'Midday', name: 'Moaning Cavern + Climbing Tower ⚠️ verify open' },
-      { time: 'Afternoon', name: 'Angels Camp Museum + Gold panning' }
+      {
+        time: 'Morning',
+        name: 'Carson Creek Trail Loop',
+        detail: '4 mi · Free · All fitness levels · Lake views',
+        dist: '~5 mi · 10 min',
+        address: 'Carson Creek Trailhead, New Melones Lake, CA 95370',
+        maps: 'https://maps.google.com/?q=Carson+Creek+Trail+New+Melones+CA',
+        web: 'https://www.alltrails.com/trail/us/california/carson-creek-trail'
+      },
+      {
+        time: 'Midday',
+        name: 'Moaning Cavern + Climbing Tower',
+        detail: '$14/adult · $7/kid · ⚠️ Verify climbing tower open',
+        dist: '~10 mi · 15 min',
+        address: '5350 Spinnaker Dr, Vallecito, CA 95251',
+        maps: 'https://maps.google.com/?q=Moaning+Cavern+Adventure+Park+Vallecito+CA',
+        web: 'https://www.caverntours.com/moaning-cavern/'
+      },
+      {
+        time: 'Afternoon',
+        name: 'Angels Camp Museum + Gold panning',
+        detail: '$10/kid · Gold Rush history · Frog jump exhibit',
+        dist: '~2 mi · 5 min',
+        address: '753 S Main St, Angels Camp, CA 95222',
+        maps: 'https://maps.google.com/?q=Angels+Camp+Museum+Angels+Camp+CA',
+        web: 'https://www.angelscamp.gov/museum'
+      }
     ]
   },
   {
@@ -230,8 +288,33 @@ const SCHEDULE = [
     subtitle: 'Split day — rafting + Yosemite',
     groups: ['fren', 'sim'],
     activities: [
-      { time: 'Morning', name: 'Natural Bridges Trail — cave swim, everyone together' },
-      { time: 'Midday', name: 'Little kids → Rafting at Curry Village · Big kids → Sentinel Dome + Taft Point' }
+      {
+        time: 'Morning',
+        name: 'Natural Bridges Trail',
+        detail: 'Free · 2.1 mi · Cave swim · Everyone together · Get wet!',
+        dist: '~10 mi · 15 min',
+        address: '4988 Parrots Ferry Rd, Angels Camp, CA 95222',
+        maps: 'https://maps.google.com/?q=Natural+Bridges+Day+Use+Area+Vallecito+CA',
+        web: 'https://www.hikespeak.com/trails/upper-natural-bridge-hike-calaveras-county/'
+      },
+      {
+        time: 'Midday',
+        name: 'Little kids → Rafting at Curry Village',
+        detail: '~$30/person · Book in person at Curry Village',
+        dist: '~83 mi · 2 hrs',
+        address: 'Curry Village, Yosemite Valley, CA 95389',
+        maps: 'https://maps.google.com/?q=Curry+Village+Yosemite+Valley',
+        web: 'https://www.travelyosemite.com/things-to-do/rafting/'
+      },
+      {
+        time: 'Midday',
+        name: 'Big kids → Sentinel Dome + Taft Point',
+        detail: 'Free · 2.2 mi each · Epic views · Adults only split',
+        dist: '~90 mi · 2 hrs 20 min',
+        address: 'Sentinel Dome Trailhead, Glacier Point Rd, Yosemite, CA 95389',
+        maps: 'https://maps.google.com/?q=Sentinel+Dome+Yosemite',
+        web: 'https://www.alltrails.com/trail/us/california/sentinel-dome-trail'
+      }
     ]
   },
   {
@@ -240,9 +323,34 @@ const SCHEDULE = [
     subtitle: 'Full overlap day — Simmons departs, Barrus arrives',
     groups: ['all'],
     activities: [
-      { time: 'Midday', name: 'Calaveras Big Trees — North Grove (all groups together)' },
-      { time: 'Optional', name: 'South Grove for stronger hikers', opt: true },
-      { time: 'Evening', name: 'Group dinner + Murphys downtown — Frenzels + Barrus' }
+      {
+        time: 'Midday',
+        name: 'Calaveras Big Trees — North Grove',
+        detail: '~$10/car · 2 mi flat loop · All ages · Giant sequoias',
+        dist: '~30 mi · 40 min',
+        address: '1170 E Hwy 4, Arnold, CA 95223',
+        maps: 'https://maps.google.com/?q=Calaveras+Big+Trees+State+Park+Arnold+CA',
+        web: 'https://www.parks.ca.gov/calaverasbigtrees'
+      },
+      {
+        time: 'Optional',
+        name: 'South Grove — stronger hikers only',
+        detail: '5+ mi · Rugged trail · Bigger trees, fewer people · Same park',
+        dist: '~32 mi · 45 min',
+        address: 'South Grove Trailhead, Calaveras Big Trees State Park, Arnold, CA',
+        maps: 'https://maps.google.com/?q=Calaveras+Big+Trees+South+Grove+Arnold+CA',
+        web: 'https://www.parks.ca.gov/calaverasbigtrees',
+        opt: true
+      },
+      {
+        time: 'Evening',
+        name: 'Group dinner + Murphys downtown',
+        detail: '$20–40/person · All groups · Stroll Main Street after',
+        dist: '~10 mi · 15 min',
+        address: 'Main St, Murphys, CA 95247',
+        maps: 'https://maps.google.com/?q=Main+Street+Murphys+CA',
+        web: 'https://www.visitmurphys.com/'
+      }
     ]
   },
   {
@@ -251,18 +359,52 @@ const SCHEDULE = [
     subtitle: 'South Grove + swim day',
     groups: ['fren', 'bar'],
     activities: [
-      { time: 'Morning', name: 'South Grove — stronger hikers (5+ mi, rugged trail)' },
-      { time: 'Afternoon', name: 'New Melones Lake — swim + kayak, everyone' }
+      {
+        time: 'Morning',
+        name: 'Calaveras Big Trees — South Grove',
+        detail: '5+ mi · Rugged trail · Stronger hikers · Giant sequoias',
+        dist: '~32 mi · 45 min',
+        address: 'South Grove Trailhead, Calaveras Big Trees State Park, Arnold, CA',
+        maps: 'https://maps.google.com/?q=Calaveras+Big+Trees+South+Grove+Arnold+CA',
+        web: 'https://www.parks.ca.gov/calaverasbigtrees'
+      },
+      {
+        time: 'Afternoon',
+        name: 'New Melones Lake — swim + kayak',
+        detail: '~$20–30 · 12,500 acre lake · All ages · Warm water in June',
+        dist: '~8 mi · 12 min',
+        address: 'New Melones Lake Marina, 6695 Glory Hole Rd, Angels Camp, CA 95222',
+        maps: 'https://maps.google.com/?q=New+Melones+Lake+Recreation+Area+CA',
+        web: 'https://www.newmeloneslakemarina.com/'
+      }
     ]
   },
   {
     id: 'jun12',
     date: 'Fri · Jun 12',
-    subtitle: 'Rafting day',
+    subtitle: 'Rafting day — rest after',
     groups: ['fren', 'bar'],
     activities: [
-      { time: 'All day', name: 'Big kids → Rafting — Sierra Mac (booked) · Little kids → TBD' },
-      { time: 'Evening', name: 'Rest, cabin dinner — everyone will be tired' }
+      {
+        time: 'All day',
+        name: 'Big kids → Rafting — Sierra Mac',
+        detail: '$123–168/person · Booked · Full day on the river',
+        dist: '~45 mi · 55 min',
+        address: 'Sierra Mac River Trips, 18938 CA-120, Groveland, CA 95321',
+        maps: 'https://maps.google.com/?q=Sierra+Mac+River+Trips+Groveland+CA',
+        web: 'https://www.sierramac.com/'
+      },
+      {
+        time: 'All day',
+        name: 'Little kids → TBD',
+        detail: 'Something easy nearby while big kids raft',
+        opt: true
+      },
+      {
+        time: 'Evening',
+        name: 'Rest, cabin dinner',
+        detail: 'Everyone will be tired — keep it low key'
+      }
     ]
   },
   {
@@ -272,7 +414,16 @@ const SCHEDULE = [
     groups: ['fren', 'bar'],
     activities: [
       { time: 'Morning', name: 'Pack up, check out, head home' },
-      { time: 'Optional', name: 'Mercer Caverns or Murphys stop on the way out', opt: true }
+      {
+        time: 'Optional',
+        name: 'Mercer Caverns on the way out',
+        detail: '~$20/adult · 45 min guided tour · Great last stop',
+        dist: '~8 mi · 12 min',
+        address: '1665 Sheep Ranch Rd, Murphys, CA 95247',
+        maps: 'https://maps.google.com/?q=Mercer+Caverns+Murphys+CA',
+        web: 'https://mercercaverns.com/',
+        opt: true
+      }
     ]
   }
 ];
@@ -364,7 +515,18 @@ function renderSchedule() {
       html += '<div class="activity-row">';
       html += '<div class="activity-time">' + a.time + '</div>';
       html += '<div class="activity-dot"></div>';
-      html += '<div class="activity-name">' + a.name + (a.opt ? '<span class="opt">(optional)</span>' : '') + '</div>';
+      html += '<div class="activity-body">';
+      html += '<div class="activity-name">' + a.name + (a.opt ? ' <span class="opt">(optional)</span>' : '') + '</div>';
+      if (a.detail) html += '<div class="activity-detail">' + a.detail + '</div>';
+      if (a.dist) html += '<div class="activity-dist">📍 ' + a.dist + ' from camp</div>';
+      if (a.address) html += '<div class="activity-address">' + a.address + '</div>';
+      if (a.maps || a.web) {
+        html += '<div class="activity-links">';
+        if (a.maps) html += '<a class="activity-link maps" href="' + a.maps + '" target="_blank">🗺 Maps</a>';
+        if (a.web) html += '<a class="activity-link web" href="' + a.web + '" target="_blank">🔗 Website</a>';
+        html += '</div>';
+      }
+      html += '</div>';
       html += '</div>';
     });
     html += '</div>';
